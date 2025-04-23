@@ -1,0 +1,29 @@
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Huesped } from 'src/huesped/entities/huesped.entity';
+
+@Entity()
+export class ContactoEmergencia {
+ // Identificador único del contacto de emergencia
+ @PrimaryGeneratedColumn()
+ id_contacto: number;
+
+ // Identificador del huésped asociado
+ @Column()
+ id_huesped: number;
+
+ // Nombre completo del contacto de emergencia
+ @Column()
+ nombre: string;
+
+ // Número de teléfono del contacto
+ @Column()
+ telefono: string;
+
+ // Parentesco con el huésped
+ @Column()
+ parentesco: string;
+
+ // Relación ManyToOne con la entidad Huesped
+ @ManyToOne(() => Huesped, huesped => huesped.contactos_emergencia)
+ huesped: Huesped;
+}

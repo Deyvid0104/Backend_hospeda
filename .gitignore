@@ -1,0 +1,69 @@
+# Ignorar archivos generados durante la compilación
+/dist
+/node_modules
+/build
+
+# Ignorar archivos de registro generados por la aplicación
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Ignorar archivos del sistema operativo
+# OS
+.DS_Store
+
+# Ignorar archivos de cobertura de pruebas
+# Tests
+/coverage
+/.nyc_output
+
+# Ignorar archivos de configuración de IDEs y editores
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Ignorar archivos de configuración de VSCode, excepto los específicos
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Ignorar archivos de variables de entorno
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# Ignorar directorios temporales
+# temp directory
+.temp
+.tmp
+
+# Ignora ejemplos de datos
+*_sample.json
+
+
+# Ignorar datos de ejecución
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Ignorar informes de diagnóstico
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
