@@ -1,6 +1,6 @@
 import { DetalleReserva } from 'src/detalle_reserva/entities/detalle_reserva.entity';
 import { HistorialMantenimiento } from 'src/historial_mantenimiento/entities/historial_mantenimiento.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, Index } from 'typeorm';
 
 @Entity()
 export class Habitacion {
@@ -9,6 +9,7 @@ export class Habitacion {
  id_habitacion: number;
 
  // Número asignado a la habitación
+ @Index({ unique: true })
  @Column()
  numero: number;
 

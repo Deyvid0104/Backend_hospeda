@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common';
 import { ContactoEmergenciaService } from './contacto_emergencia.service';
 import { CreateContactoEmergenciaDto } from './dto/create-contacto_emergencia.dto';
 import { UpdateContactoEmergenciaDto } from './dto/update-contacto_emergencia.dto';
@@ -48,14 +48,14 @@ export class ContactoEmergenciaController {
   */
 
   // Actualizar un contacto de emergencia por ID
-  // PATCH /contacto-emergencia/:id
-  @Patch(':id')
+  // PUT /contacto-emergencia/:id
+  @Put(':id')
   actualizarContacto(@Param('id') id: string, @Body() updateContactoEmergenciaDto: UpdateContactoEmergenciaDto) {
     return this.contactoEmergenciaService.actualizarContacto(+id, updateContactoEmergenciaDto);
   }
   /*
   Ejemplo:
-  PATCH http://localhost:4000/contacto-emergencia/1
+  PUT http://localhost:4000/contacto-emergencia/1
   Content-Type: application/json
   {
     "telefono": "987654321"

@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { HabitacionService } from './habitacion.service';
 import { CreateHabitacionDto } from './dto/create-habitacion.dto';
 import { UpdateHabitacionDto } from './dto/update-habitacion.dto';
-
+import { RolesGuard } from 'src/auth/roles.guard';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Roles } from 'src/auth/roles.decorator';
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('habitacion')
 export class HabitacionController {
   constructor(private readonly habitacionService: HabitacionService) {}
@@ -10,6 +13,7 @@ export class HabitacionController {
   // Crear una nueva habitación
   // POST /habitacion
   @Post()
+  @Roles('admin')
   crearHabitacion(@Body() createHabitacionDto: CreateHabitacionDto) {
     return this.habitacionService.crearHabitacion(createHabitacionDto);
   }
@@ -49,15 +53,16 @@ export class HabitacionController {
   */
 
   // Actualizar una habitación por ID
-  // PATCH /habitacion/:id
+  // PUT /habitacion/:id
   // Cuerpo de la petición: JSON con los campos a actualizar según UpdateHabitacionDto
-  @Patch(':id')
+  @Put(':id')
+  @Roles('admin')
   actualizarHabitacion(@Param('id') id: string, @Body() updateHabitacionDto: UpdateHabitacionDto) {
     return this.habitacionService.actualizarHabitacion(+id, updateHabitacionDto);
   }
   /*
   Ejemplo:
-  PATCH http://localhost:4000/habitacion/1
+  PUT http://localhost:4000/habitacion/1
   Content-Type: application/json
   {
     "estado": "ocupada"
@@ -67,6 +72,7 @@ export class HabitacionController {
   // Eliminar una habitación por ID
   // DELETE /habitacion/:id
   @Delete(':id')
+  @Roles('admin')
   eliminarHabitacion(@Param('id') id: string) {
     return this.habitacionService.eliminarHabitacion(+id);
   }

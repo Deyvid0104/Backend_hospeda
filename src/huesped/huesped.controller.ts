@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
 import { HuespedService } from './huesped.service';
 import { CreateHuespedDto } from './dto/create-huesped.dto';
 import { UpdateHuespedDto } from './dto/update-huesped.dto';
@@ -48,15 +48,15 @@ export class HuespedController {
   */
 
   // Actualizar un huésped por ID
-  // PATCH /huesped/:id
+  // PUT /huesped/:id
   // Cuerpo de la petición: JSON con los campos a actualizar según UpdateHuespedDto
-  @Patch(':id')
+  @Put(':id')
   actualizarHuesped(@Param('id') id: string, @Body() updateHuespedDto: UpdateHuespedDto) {
     return this.huespedService.actualizarHuesped(+id, updateHuespedDto);
   }
   /*
   Ejemplo:
-  PATCH http://localhost:4000/huesped/1
+  PUT http://localhost:4000/huesped/1
   Content-Type: application/json
   {
     "telefono": "555-4321"

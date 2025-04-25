@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
 import { ServicioAdicionalService } from './servicio_adicional.service';
 import { CreateServicioAdicionalDto } from './dto/create-servicio_adicional.dto';
 import { UpdateServicioAdicionalDto } from './dto/update-servicio_adicional.dto';
@@ -46,14 +46,14 @@ export class ServicioAdicionalController {
   */
 
   // Actualizar un servicio adicional por ID
-  // PATCH /servicio-adicional/:id
-  @Patch(':id')
+  // PUT /servicio-adicional/:id
+  @Put(':id')
   actualizarServicio(@Param('id') id: string, @Body() updateServicioAdicionalDto: UpdateServicioAdicionalDto) {
     return this.servicioAdicionalService.update(+id, updateServicioAdicionalDto);
   }
   /*
   Ejemplo:
-  PATCH http://localhost:4000/servicio-adicional/1
+  PUT http://localhost:4000/servicio-adicional/1
   Content-Type: application/json
   {
     "precio": 12.00

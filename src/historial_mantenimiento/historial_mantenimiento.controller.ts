@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
 import { HistorialMantenimientoService } from './historial_mantenimiento.service';
 import { CreateHistorialMantenimientoDto } from './dto/create-historial_mantenimiento.dto';
 import { UpdateHistorialMantenimientoDto } from './dto/update-historial_mantenimiento.dto';
@@ -50,14 +50,14 @@ export class HistorialMantenimientoController {
   */
 
   // Actualizar un historial de mantenimiento por ID
-  // PATCH /historial-mantenimiento/:id
-  @Patch(':id')
+  // PUT /historial-mantenimiento/:id
+  @Put(':id')
   actualizarHistorial(@Param('id') id: string, @Body() updateHistorialMantenimientoDto: UpdateHistorialMantenimientoDto) {
     return this.historialMantenimientoService.actualizarHistorial(+id, updateHistorialMantenimientoDto);
   }
   /*
   Ejemplo:
-  PATCH http://localhost:4000/historial-mantenimiento/1
+  PUT http://localhost:4000/historial-mantenimiento/1
   Content-Type: application/json
   {
     "estado": "completado"

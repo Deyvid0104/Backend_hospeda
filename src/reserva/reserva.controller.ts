@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
 import { ReservaService } from './reserva.service';
 import { CreateReservaDto } from './dto/create-reserva.dto';
 import { UpdateReservaDto } from './dto/update-reserva.dto';
@@ -48,15 +48,15 @@ export class ReservaController {
   */
 
   // Actualizar una reserva por ID
-  // PATCH /reserva/:id
+  // PUT /reserva/:id
   // Cuerpo de la petición: JSON con los campos a actualizar según UpdateReservaDto
-  @Patch(':id')
+  @Put(':id')
   actualizarReserva(@Param('id') id: string, @Body() updateReservaDto: UpdateReservaDto) {
     return this.reservaService.actualizarReserva(+id, updateReservaDto);
   }
   /*
   Ejemplo:
-  PATCH http://localhost:4000/reserva/1
+  PUT http://localhost:4000/reserva/1
   Content-Type: application/json
   {
     "fecha_fin": "2023-07-06"

@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Usuario } from './entities/usuario.entity';
 import { Repository, Like, MoreThan } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsuarioService {
@@ -16,21 +17,46 @@ export class UsuarioService {
   // Método para crear un nuevo usuario en la base de datos
   async crearUsuario(createUsuarioDto: CreateUsuarioDto): Promise<Usuario> {
     const nuevoUsuario = this.UsuarioRepository.create(createUsuarioDto);
-    return await this.UsuarioRepository.save(nuevoUsuario);
+    // Validar longitud mínima de contraseña
+    if (createUsuarioDto.contraseña) {
+      const trimmedPassword = createUsuarioDto.contraseña.trim();
+      if (trimmedPassword.length >= 5) {
+        const saltRounds = 10;
+        nuevoUsuario.contraseña = await bcrypt.hash(trimmedPassword, saltRounds);
+      } else {
+        throw new BadRequestException('La contraseña debe tener al menos 5 caracteres.');
+      }
+    } else {
+      throw new BadRequestException('La contraseña es requerida.');
+    }
+    try {
+      return await this.UsuarioRepository.save(nuevoUsuario);
+    } catch (error) {
+      // Maneja error de clave única para email duplicado
+      if (error.code === 'ER_DUP_ENTRY' || error.errno === 1062) {
+        // Lanza excepción HTTP con mensaje claro para que sea devuelto como respuesta
+        throw new BadRequestException('El correo electrónico ya está registrado.');
+      }
+      throw error;
+    }
   }
 
   // Método para obtener todos los usuarios registrados
-  async obtenerTodosLosUsuarios(): Promise<Usuario[]> {
-    return await this.UsuarioRepository.find();
+  async obtenerTodosLosUsuarios(): Promise<Partial<Usuario>[]> {
+    const usuarios = await this.UsuarioRepository.find();
+    // Ocultar contraseña en la respuesta
+    return usuarios.map(({ contraseña, ...resto }) => resto);
   }
 
   // Método para obtener un usuario por su ID
-  async obtenerUsuarioPorId(id_usuario: number): Promise<Usuario> {
+  async obtenerUsuarioPorId(id_usuario: number): Promise<Partial<Usuario>> {
     const usuario = await this.UsuarioRepository.findOneBy({ id_usuario });
     if (!usuario) {
       throw new NotFoundException(`Usuario con ID ${id_usuario} no encontrado`);
     }
-    return usuario;
+    // Ocultar contraseña en la respuesta
+    const { contraseña, ...resto } = usuario;
+    return resto;
   }
 
   // Método para actualizar un usuario existente por su ID
@@ -42,12 +68,23 @@ export class UsuarioService {
     if (!usuario) {
       throw new NotFoundException(`Usuario con ID ${id_usuario} no encontrado para actualizar`);
     }
+    // Validar longitud mínima de contraseña si se proporciona
+    if (updateUsuarioDto.contraseña) {
+      if (updateUsuarioDto.contraseña.length < 5) {
+        throw new BadRequestException('La contraseña debe tener al menos 5 caracteres.');
+      }
+      const saltRounds = 10;
+      usuario.contraseña = await bcrypt.hash(updateUsuarioDto.contraseña, saltRounds);
+    }
     return await this.UsuarioRepository.save(usuario);
   }
 
   // Método para eliminar un usuario por su ID
   async eliminarUsuario(id_usuario: number): Promise<void> {
-    const usuario = await this.obtenerUsuarioPorId(id_usuario);
+    const usuario = await this.UsuarioRepository.findOneBy({ id_usuario });
+    if (!usuario) {
+      throw new NotFoundException(`Usuario con ID ${id_usuario} no encontrado para eliminar`);
+    }
     await this.UsuarioRepository.remove(usuario);
   }
 

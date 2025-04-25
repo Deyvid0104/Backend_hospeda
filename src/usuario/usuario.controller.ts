@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
@@ -47,15 +47,15 @@ export class UsuarioController {
   */
 
   // Actualizar un usuario por ID
-  // PATCH /usuario/:id
+  // PUT /usuario/:id
   // Cuerpo de la petición: JSON con los campos a actualizar según UpdateUsuarioDto
-  @Patch(':id')
+  @Put(':id')
   actualizarUsuario(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
     return this.usuarioService.actualizarUsuario(+id, updateUsuarioDto);
   }
   /*
   Ejemplo:
-  PATCH http://localhost:4000/usuario/1
+  PUT http://localhost:4000/usuario/1
   Content-Type: application/json
   {
     "password": "newpassword"

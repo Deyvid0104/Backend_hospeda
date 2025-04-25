@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsNumber } from 'class-validator';
+import { IsString, IsEnum, IsNumber, Min } from 'class-validator';
 
 export class CreateHabitacionDto {
  // Número identificador de la habitación
@@ -15,6 +15,7 @@ export class CreateHabitacionDto {
 
  // Precio base de la habitación con hasta dos decimales
  @IsNumber({ maxDecimalPlaces: 2 })
+ @Min(0.01, { message: 'El precio base debe ser un valor positivo' })
  precio_base: number;
 
  // Capacidad máxima de personas que puede alojar la habitación

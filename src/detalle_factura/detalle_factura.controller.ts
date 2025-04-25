@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common';
 import { DetalleFacturaService } from './detalle_factura.service';
 import { CreateDetalleFacturaDto } from './dto/create-detalle_factura.dto';
 import { UpdateDetalleFacturaDto } from './dto/update-detalle_factura.dto';
@@ -48,14 +48,14 @@ export class DetalleFacturaController {
   */
 
   // Actualizar un detalle de factura por ID
-  // PATCH /detalle-factura/:id
-  @Patch(':id')
+  // PUT /detalle-factura/:id
+  @Put(':id')
   actualizarDetalle(@Param('id') id: string, @Body() updateDetalleFacturaDto: UpdateDetalleFacturaDto) {
     return this.detalleFacturaService.actualizarDetalle(+id, updateDetalleFacturaDto);
   }
   /*
   Ejemplo:
-  PATCH http://localhost:4000/detalle-factura/1
+  PUT http://localhost:4000/detalle-factura/1
   Content-Type: application/json
   {
     "cantidad": 5

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common';
 import { DetalleReservaService } from './detalle_reserva.service';
 import { CreateDetalleReservaDto } from './dto/create-detalle_reserva.dto';
 import { UpdateDetalleReservaDto } from './dto/update-detalle_reserva.dto';
@@ -47,14 +47,14 @@ export class DetalleReservaController {
   */
 
   // Actualizar un detalle de reserva por ID
-  // PATCH /detalle-reserva/:id
-  @Patch(':id')
+  // PUT /detalle-reserva/:id
+  @Put(':id')
   actualizarDetalle(@Param('id') id: string, @Body() updateDetalleReservaDto: UpdateDetalleReservaDto) {
     return this.detalleReservaService.actualizarDetalle(+id, updateDetalleReservaDto);
   }
   /*
   Ejemplo:
-  PATCH http://localhost:4000/detalle-reserva/1
+  PUT http://localhost:4000/detalle-reserva/1
   Content-Type: application/json
   {
     "precio": 130.00

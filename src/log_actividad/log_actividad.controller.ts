@@ -1,8 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Put } from '@nestjs/common';
 import { LogActividadService } from './log_actividad.service';
 import { CreateLogActividadDto } from './dto/create-log_actividad.dto';
 import { UpdateLogActividadDto } from './dto/update-log_actividad.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('admin')
 @Controller('log-actividad')
 export class LogActividadController {
   constructor(private readonly logActividadService: LogActividadService) {}
@@ -69,14 +74,14 @@ export class LogActividadController {
   */
 
   // Actualizar un log de actividad por ID
-  // PATCH /log-actividad/:id
-  @Patch(':id')
+  // PUT /log-actividad/:id
+  @Put(':id')
   actualizar(@Param('id') id: string, @Body() updateLogActividadDto: UpdateLogActividadDto) {
     return this.logActividadService.actualizarLog(+id, updateLogActividadDto);
   }
   /*
   Ejemplo:
-  PATCH http://localhost:4000/log-actividad/1
+  PUT http://localhost:4000/log-actividad/1
   Content-Type: application/json
   {
     "accion": "Logout"

@@ -17,7 +17,7 @@ Sistema backend para la gestión de huéspedes en establecimientos hoteleros, de
 1. Clona el repositorio:
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone https://github.com/Deyvid0104/Backend_hospeda.git
 cd hospeda
 ```
 
@@ -63,61 +63,6 @@ DB_DATABASE=nombre_base_de_datos
 
 ---
 
-## Dependencias
-
-Dependencias principales:
-
-- @nestjs/common
-- @nestjs/config
-- @nestjs/core
-- @nestjs/jwt
-- @nestjs/mapped-types
-- @nestjs/passport
-- @nestjs/platform-express
-- @nestjs/typeorm
-- @types/bcrypt
-- @types/passport-jwt
-- @types/passport-local
-- bcrypt
-- class-validator
-- mysql
-- passport
-- passport-jwt
-- passport-local
-- reflect-metadata
-- rxjs
-- typeorm
-
-Dependencias de desarrollo:
-
-- @eslint/eslintrc
-- @eslint/js
-- @nestjs/cli
-- @nestjs/schematics
-- @nestjs/testing
-- @swc/cli
-- @swc/core
-- @types/express
-- @types/jest
-- @types/node
-- @types/supertest
-- eslint
-- eslint-config-prettier
-- eslint-plugin-prettier
-- globals
-- jest
-- prettier
-- source-map-support
-- supertest
-- ts-jest
-- ts-loader
-- ts-node
-- tsconfig-paths
-- typescript
-- typescript-eslint
-
----
-
 ## Tecnologías usadas
 
 - NestJS
@@ -139,7 +84,7 @@ Dependencias de desarrollo:
 - `POST /huesped` - Crear un huésped
 - `GET /huesped` - Obtener todos los huéspedes
 - `GET /huesped/:id` - Obtener un huésped por ID
-- `PATCH /huesped/:id` - Actualizar un huésped por ID
+- `PUT /huesped/:id` - Actualizar un huésped por ID
 - `DELETE /huesped/:id` - Eliminar un huésped por ID
 
 ### Habitaciones
@@ -147,7 +92,7 @@ Dependencias de desarrollo:
 - `POST /habitacion` - Crear una nueva habitación
 - `GET /habitacion` - Obtener todas las habitaciones
 - `GET /habitacion/:id` - Obtener una habitación por ID
-- `PATCH /habitacion/:id` - Actualizar una habitación por ID
+- `PUT /habitacion/:id` - Actualizar una habitación por ID
 - `DELETE /habitacion/:id` - Eliminar una habitación por ID
 - `GET /habitacion/tipo?tipo=...` - Obtener habitaciones por tipo
 - `GET /habitacion/estado?estado=...` - Obtener habitaciones por estado
@@ -159,7 +104,7 @@ Dependencias de desarrollo:
 - `POST /reserva` - Crear una nueva reserva
 - `GET /reserva` - Obtener todas las reservas
 - `GET /reserva/:id` - Obtener una reserva por ID
-- `PATCH /reserva/:id` - Actualizar una reserva por ID
+- `PUT /reserva/:id` - Actualizar una reserva por ID
 - `DELETE /reserva/:id` - Eliminar una reserva por ID
 
 ### Servicios Adicionales
@@ -167,7 +112,7 @@ Dependencias de desarrollo:
 - `POST /servicio-adicional` - Crear un nuevo servicio adicional
 - `GET /servicio-adicional` - Obtener todos los servicios adicionales
 - `GET /servicio-adicional/:id` - Obtener un servicio adicional por ID
-- `PATCH /servicio-adicional/:id` - Actualizar un servicio adicional por ID
+- `PUT /servicio-adicional/:id` - Actualizar un servicio adicional por ID
 - `DELETE /servicio-adicional/:id` - Eliminar un servicio adicional por ID
 
 ### Contactos de Emergencia
@@ -175,7 +120,7 @@ Dependencias de desarrollo:
 - `POST /contacto-emergencia` - Crear un nuevo contacto de emergencia
 - `GET /contacto-emergencia` - Obtener todos los contactos de emergencia
 - `GET /contacto-emergencia/:id` - Obtener un contacto de emergencia por ID
-- `PATCH /contacto-emergencia/:id` - Actualizar un contacto de emergencia por ID
+- `PUT /contacto-emergencia/:id` - Actualizar un contacto de emergencia por ID
 - `DELETE /contacto-emergencia/:id` - Eliminar un contacto de emergencia por ID
 - `GET /contacto-emergencia/buscar?nombre=...` - Buscar contactos por nombre parcial
 - `GET /contacto-emergencia/huesped?id_huesped=...` - Obtener contactos por huésped
@@ -185,7 +130,7 @@ Dependencias de desarrollo:
 - `POST /factura` - Crear una nueva factura
 - `GET /factura` - Obtener todas las facturas
 - `GET /factura/:id` - Obtener una factura por ID
-- `PATCH /factura/:id` - Actualizar una factura por ID
+- `PUT /factura/:id` - Actualizar una factura por ID
 - `DELETE /factura/:id` - Eliminar una factura por ID
 - `GET /factura/rango-monto?montoMin=...&montoMax=...` - Obtener facturas por rango de monto
 - `GET /factura/metodo-pago?metodo=...` - Obtener facturas por método de pago
@@ -195,7 +140,7 @@ Dependencias de desarrollo:
 - `POST /detalle-factura` - Crear un nuevo detalle de factura
 - `GET /detalle-factura` - Obtener todos los detalles de factura
 - `GET /detalle-factura/:id` - Obtener un detalle de factura por ID
-- `PATCH /detalle-factura/:id` - Actualizar un detalle de factura por ID
+- `PUT /detalle-factura/:id` - Actualizar un detalle de factura por ID
 - `DELETE /detalle-factura/:id` - Eliminar un detalle de factura por ID
 - `GET /detalle-factura/factura?id_factura=...` - Obtener detalles por factura
 - `GET /detalle-factura/servicio?id_servicio=...` - Obtener detalles por servicio
@@ -205,7 +150,7 @@ Dependencias de desarrollo:
 - `POST /detalle-reserva` - Crear un nuevo detalle de reserva
 - `GET /detalle-reserva` - Obtener todos los detalles de reserva
 - `GET /detalle-reserva/:id` - Obtener un detalle de reserva por ID
-- `PATCH /detalle-reserva/:id` - Actualizar un detalle de reserva por ID
+- `PUT /detalle-reserva/:id` - Actualizar un detalle de reserva por ID
 - `DELETE /detalle-reserva/:id` - Eliminar un detalle de reserva por ID
 - `GET /detalle-reserva/reserva?id_reserva=...` - Obtener detalles por reserva
 - `GET /detalle-reserva/habitacion?id_habitacion=...` - Obtener detalles por habitación
@@ -215,7 +160,7 @@ Dependencias de desarrollo:
 - `POST /historial-mantenimiento` - Crear un nuevo historial de mantenimiento
 - `GET /historial-mantenimiento` - Obtener todos los historiales de mantenimiento
 - `GET /historial-mantenimiento/:id` - Obtener un historial de mantenimiento por ID
-- `PATCH /historial-mantenimiento/:id` - Actualizar un historial de mantenimiento por ID
+- `PUT /historial-mantenimiento/:id` - Actualizar un historial de mantenimiento por ID
 - `DELETE /historial-mantenimiento/:id` - Eliminar un historial de mantenimiento por ID
 
 ### Logs de Actividad
@@ -225,7 +170,7 @@ Dependencias de desarrollo:
 - `GET /log-actividad/:id` - Obtener un log de actividad por ID
 - `GET /log-actividad/usuario/:id_usuario` - Obtener logs por usuario
 - `GET /log-actividad/buscar/:accion` - Buscar logs por acción parcial
-- `PATCH /log-actividad/:id` - Actualizar un log de actividad por ID
+- `PUT /log-actividad/:id` - Actualizar un log de actividad por ID
 - `DELETE /log-actividad/:id` - Eliminar un log de actividad por ID
 
 ### Usuarios
@@ -233,7 +178,7 @@ Dependencias de desarrollo:
 - `POST /usuario` - Crear un usuario
 - `GET /usuario` - Obtener todos los usuarios
 - `GET /usuario/:id` - Obtener un usuario por ID
-- `PATCH /usuario/:id` - Actualizar un usuario por ID
+- `PUT /usuario/:id` - Actualizar un usuario por ID
 - `DELETE /usuario/:id` - Eliminar un usuario por ID
 - `GET /usuario/rol?rol=...` - Obtener usuarios por rol
 - `GET /usuario/buscar?nombre=...` - Buscar usuarios por nombre parcial
