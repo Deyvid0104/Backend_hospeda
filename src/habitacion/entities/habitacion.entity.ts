@@ -35,6 +35,10 @@ export class Habitacion {
  @Column()
  capacidad: number;
 
+ // Foto de la habitación (URL o base64)
+ @Column({ type: 'varchar', nullable: true })
+ foto?: string;
+
  // Reservas asociadas a esta habitación
  @OneToMany(() => DetalleReserva, detalle => detalle.habitacion)
  detalles_reserva: DetalleReserva[];

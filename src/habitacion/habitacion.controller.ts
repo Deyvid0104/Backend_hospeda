@@ -5,6 +5,7 @@ import { UpdateHabitacionDto } from './dto/update-habitacion.dto';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
+
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('habitacion')
 export class HabitacionController {
@@ -26,7 +27,8 @@ export class HabitacionController {
     "tipo": "doble",
     "precio_base": 120.00,
     "estado": "libre",
-    "capacidad": 2
+    "capacidad": 2,
+    "foto": "https://example.com/foto.jpg"
   }
   */
 
@@ -65,7 +67,8 @@ export class HabitacionController {
   PUT http://localhost:4000/habitacion/1
   Content-Type: application/json
   {
-    "estado": "ocupada"
+    "estado": "ocupada",
+    "foto": "https://example.com/nueva-foto.jpg"
   }
   */
 

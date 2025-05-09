@@ -22,7 +22,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       name:'austral',                 //Nombre de la conexión a la base de datos. Se puede usar para varias conexiones a la misma base de datos.
       type:'mysql',                   //Tipo de base de datos
       host:process.env.URL,           //URL de la base de datos
-      port:3306,                      //Puerto de la base de datos
+      port:30306,                     //Puerto de la base de datos
       username:process.env.USUARIO,   //Usuario de la base de datos
       password:process.env.PASSWORD,  //Contraseña de la base de datos
       database: process.env.DBNAME,   //Nombre de la base de datos
