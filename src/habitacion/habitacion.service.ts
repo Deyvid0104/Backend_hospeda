@@ -8,24 +8,23 @@ import { Repository, Between } from 'typeorm';
 @Injectable()
 export class HabitacionService {
   constructor(
-    // Inyección del repositorio para acceder a la base de datos
+    // Inyección del repositorio para acceso a la base de datos MySQL con TypeORM
     @InjectRepository(Habitacion, 'austral')
     private HabitacionRepository: Repository<Habitacion>,
   ) {}
 
-  // Método para crear una nueva habitación
+  // Crear una nueva habitación en la base de datos
   async crearHabitacion(createHabitacionDto: CreateHabitacionDto): Promise<Habitacion> {
     const nuevaHabitacion = this.HabitacionRepository.create(createHabitacionDto);
-    // Guardar la nueva habitación en la base de datos
     return await this.HabitacionRepository.save(nuevaHabitacion);
   }
 
-  // Método para obtener todas las habitaciones
+  // Obtener todas las habitaciones registradas
   async obtenerTodasLasHabitaciones(): Promise<Habitacion[]> {
     return await this.HabitacionRepository.find();
   }
 
-  // Método para obtener una habitación por su id
+  // Obtener una habitación por su identificador único
   async obtenerHabitacionPorId(id: number): Promise<Habitacion> {
     const habitacion = await this.HabitacionRepository.findOneBy({ id_habitacion: id });
     if (!habitacion) {
@@ -35,21 +34,20 @@ export class HabitacionService {
     return habitacion;
   }
 
-  // Método para actualizar una habitación por su id
+  // Actualizar los datos de una habitación existente por su id
   async actualizarHabitacion(id: number, updateHabitacionDto: UpdateHabitacionDto): Promise<Habitacion> {
     const habitacion = await this.HabitacionRepository.preload({
       id_habitacion: id,
       ...updateHabitacionDto,
     });
     if (!habitacion) {
-      // Lanzar excepción si no se encuentra la habitación a actualizar
+      // Lanzar excepción si no se encuentra la habitación para actualizar
       throw new NotFoundException(`Habitación con id ${id} no encontrada para actualizar`);
     }
-    // Guardar los cambios en la base de datos
     return await this.HabitacionRepository.save(habitacion);
   }
 
-  // Método para eliminar una habitación por su id
+  // Eliminar una habitación por su id
   async eliminarHabitacion(id: number): Promise<void> {
     const resultado = await this.HabitacionRepository.delete(id);
     if (resultado.affected === 0) {
@@ -58,24 +56,24 @@ export class HabitacionService {
     }
   }
 
-  // Método para obtener habitaciones por tipo
+  // Obtener habitaciones filtradas por tipo
   async obtenerHabitacionesPorTipo(tipo: 'individual' | 'doble' | 'triple' | 'dormitorio'): Promise<Habitacion[]> {
     return await this.HabitacionRepository.find({ where: { tipo } });
   }
 
-  // Método para obtener habitaciones por estado
+  // Obtener habitaciones filtradas por estado
   async obtenerHabitacionesPorEstado(estado: 'libre' | 'ocupada' | 'limpieza' | 'mantenimiento'): Promise<Habitacion[]> {
     return await this.HabitacionRepository.find({ where: { estado } });
   }
 
-  // Método para obtener habitaciones por rango de precio_base
+  // Obtener habitaciones filtradas por rango de precio_base
   async obtenerHabitacionesPorRangoPrecio(precioMin: number, precioMax: number): Promise<Habitacion[]> {
     return await this.HabitacionRepository.find({
       where: { precio_base: Between(precioMin, precioMax) },
     });
   }
 
-  // Método para buscar habitaciones por número exacto
+  // Buscar habitaciones por número exacto
   async buscarHabitacionesPorNumero(numero: number): Promise<Habitacion[]> {
     return await this.HabitacionRepository.find({
       where: { numero },

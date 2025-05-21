@@ -2,9 +2,10 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany, Index } from 'typeor
 import { LogActividad } from 'src/log_actividad/entities/log_actividad.entity';
 import { MinLength } from 'class-validator';
 
+// Entidad que representa la tabla Usuario en la base de datos
 @Entity()
 export class Usuario {
- // Identificador único del usuario
+ // Identificador único del usuario (clave primaria)
  @PrimaryGeneratedColumn()
  id_usuario: number;
 
@@ -19,7 +20,7 @@ export class Usuario {
  })
  rol: 'admin' | 'recepcionista';
 
- // Contraseña en hash
+ // Contraseña en hash, con validación mínima de longitud
  @Column()
  @MinLength(5 , { message: 'La contraseña debe tener al menos 5 caracteres' })
  contraseña: string;
@@ -30,13 +31,13 @@ export class Usuario {
  email: string;
 
  // Fecha y hora del último acceso, por defecto la fecha actual UTC
+ // Ajusta la fecha a la zona horaria de Madrid (UTC+1 o UTC+2 con horario de verano)
  @Column({ 
    type: 'timestamp', 
    default: () => 'CURRENT_TIMESTAMP',
    transformer: {
      to: (value: Date) => value,
      from: (value: Date) => {
-       // Ajusta la fecha a la zona horaria de Madrid (UTC+1 o UTC+2 con horario de verano)
        const madridOffset = 60; // minutos de diferencia UTC+1
        const date = new Date(value);
        date.setMinutes(date.getMinutes() + madridOffset);
@@ -46,7 +47,7 @@ export class Usuario {
  })
  ultimo_acceso: Date;
 
- // Relación OneToMany con la entidad LogActividad
+ // Relación uno a muchos con la entidad LogActividad (logs de actividad del usuario)
  @OneToMany(() => LogActividad, log => log.usuario)
  logs: LogActividad[];
 }

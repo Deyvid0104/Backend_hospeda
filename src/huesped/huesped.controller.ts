@@ -3,6 +3,7 @@ import { HuespedService } from './huesped.service';
 import { CreateHuespedDto } from './dto/create-huesped.dto';
 import { UpdateHuespedDto } from './dto/update-huesped.dto';
 
+// Controlador para manejar las rutas relacionadas con la entidad Huésped
 @Controller('huesped')
 export class HuespedController {
   constructor(private readonly huespedService: HuespedService) {}

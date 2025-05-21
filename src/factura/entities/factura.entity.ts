@@ -2,13 +2,14 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, OneToMany
 import { Reserva } from 'src/reserva/entities/reserva.entity';
 import { DetalleFactura } from 'src/detalle_factura/entities/detalle_factura.entity';
 
+// Entidad que representa la tabla Factura en la base de datos
 @Entity()
 export class Factura {
- // Identificador único de la factura
+ // Identificador único de la factura (clave primaria)
  @PrimaryGeneratedColumn()
  id_factura: number;
 
- // Monto total de la factura
+ // Monto total de la factura con precisión decimal
  @Column({ type: 'decimal', precision: 10, scale: 2 })
  monto_total: number;
 
@@ -26,12 +27,12 @@ export class Factura {
  })
  estado: 'pendiente' | 'pagada' | 'anulada';
 
- // Relación OneToOne con la entidad Reserva
+ // Relación OneToOne con la entidad Reserva (una factura está asociada a una reserva)
  @OneToOne(() => Reserva, reserva => reserva.factura)
  @JoinColumn()
  reserva: Reserva;
 
- // Relación OneToMany con la entidad DetalleFactura
+ // Relación OneToMany con la entidad DetalleFactura (una factura puede tener varios detalles)
  @OneToMany(() => DetalleFactura, detalle => detalle.factura)
  detalles_factura: DetalleFactura[];
 }

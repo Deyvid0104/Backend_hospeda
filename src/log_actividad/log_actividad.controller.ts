@@ -6,6 +6,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
 
+// Controlador para manejar las rutas relacionadas con la entidad LogActividad
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('admin')
 @Controller('log-actividad')

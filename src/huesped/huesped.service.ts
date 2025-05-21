@@ -8,24 +8,23 @@ import { Repository, Like } from 'typeorm';
 @Injectable()
 export class HuespedService {
   constructor(
-    // Inyección del repositorio para acceder a la base de datos
+    // Inyección del repositorio para acceso a la base de datos MySQL con TypeORM
     @InjectRepository(Huesped, 'austral')
     private HuespedRepository: Repository<Huesped>,
   ) {}
 
-  // Método para crear un nuevo huésped
+  // Crear un nuevo huésped en la base de datos
   async crearHuesped(createHuespedDto: CreateHuespedDto): Promise<Huesped> {
     const nuevoHuesped = this.HuespedRepository.create(createHuespedDto);
-    // Guardar el nuevo huésped en la base de datos
     return await this.HuespedRepository.save(nuevoHuesped);
   }
 
-  // Método para obtener todos los huéspedes
+  // Obtener todos los huéspedes registrados
   async obtenerTodosLosHuespedes(): Promise<Huesped[]> {
     return await this.HuespedRepository.find();
   }
 
-  // Método para obtener un huésped por su id
+  // Obtener un huésped por su identificador único
   async obtenerHuespedPorId(id: number): Promise<Huesped> {
     const huesped = await this.HuespedRepository.findOneBy({ id_huesped: id });
     if (!huesped) {
@@ -35,21 +34,20 @@ export class HuespedService {
     return huesped;
   }
 
-  // Método para actualizar un huésped por su id
+  // Actualizar los datos de un huésped existente por su id
   async actualizarHuesped(id: number, updateHuespedDto: UpdateHuespedDto): Promise<Huesped> {
     const huesped = await this.HuespedRepository.preload({
       id_huesped: id,
       ...updateHuespedDto,
     });
     if (!huesped) {
-      // Lanzar excepción si no se encuentra el huésped a actualizar
+      // Lanzar excepción si no se encuentra el huésped para actualizar
       throw new NotFoundException(`Huésped con id ${id} no encontrado para actualizar`);
     }
-    // Guardar los cambios en la base de datos
     return await this.HuespedRepository.save(huesped);
   }
 
-  // Método para eliminar un huésped por su id
+  // Eliminar un huésped por su id
   async eliminarHuesped(id: number): Promise<void> {
     const resultado = await this.HuespedRepository.delete(id);
     if (resultado.affected === 0) {
@@ -58,14 +56,14 @@ export class HuespedService {
     }
   }
 
-  // Método para buscar huéspedes por nombre parcial
+  // Buscar huéspedes por nombre parcial
   async buscarHuespedesPorNombre(nombre: string): Promise<Huesped[]> {
     return await this.HuespedRepository.find({
       where: { nombre: Like(`%${nombre}%`) },
     });
   }
 
-  // Método para buscar huésped por email exacto
+  // Buscar huésped por email exacto
   async buscarHuespedPorEmail(email: string): Promise<Huesped | null> {
     return await this.HuespedRepository.findOneBy({ email });
   }

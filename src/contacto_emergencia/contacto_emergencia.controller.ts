@@ -3,6 +3,7 @@ import { ContactoEmergenciaService } from './contacto_emergencia.service';
 import { CreateContactoEmergenciaDto } from './dto/create-contacto_emergencia.dto';
 import { UpdateContactoEmergenciaDto } from './dto/update-contacto_emergencia.dto';
 
+// Controlador para manejar las rutas relacionadas con la entidad ContactoEmergencia
 @Controller('contacto-emergencia')
 export class ContactoEmergenciaController {
   constructor(private readonly contactoEmergenciaService: ContactoEmergenciaService) {}

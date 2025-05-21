@@ -2,9 +2,10 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Reserva } from 'src/reserva/entities/reserva.entity';
 import { ContactoEmergencia } from 'src/contacto_emergencia/entities/contacto_emergencia.entity';
 
+// Entidad que representa la tabla Huésped en la base de datos
 @Entity()
 export class Huesped {
- // Identificador único del huésped
+ // Identificador único del huésped (clave primaria)
  @PrimaryGeneratedColumn()
  id_huesped: number;
 
@@ -32,11 +33,11 @@ export class Huesped {
  @Column()
  fecha_registro: Date;
 
- // Relación OneToMany con la entidad Reserva
+ // Relación uno a muchos con la entidad Reserva (un huésped puede tener varias reservas)
  @OneToMany(() => Reserva, reserva => reserva.huesped)
  reservas: Reserva[];
 
- // Relación OneToMany con la entidad ContactoEmergencia
+ // Relación uno a muchos con la entidad ContactoEmergencia (un huésped puede tener varios contactos de emergencia)
  @OneToMany(() => ContactoEmergencia, contacto => contacto.huesped)
  contactos_emergencia: ContactoEmergencia[];
 }

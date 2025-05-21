@@ -8,24 +8,23 @@ import { Repository, Like } from 'typeorm';
 @Injectable()
 export class ContactoEmergenciaService {
   constructor(
-    // Inyección del repositorio para acceder a la base de datos
+    // Inyección del repositorio para acceso a la base de datos MySQL con TypeORM
     @InjectRepository(ContactoEmergencia, 'austral')
     private ContactoEmergenciaRepository: Repository<ContactoEmergencia>,
   ) {}
 
-  // Método para crear un nuevo contacto de emergencia
+  // Crear un nuevo contacto de emergencia en la base de datos
   async crearContacto(createContactoEmergenciaDto: CreateContactoEmergenciaDto): Promise<ContactoEmergencia> {
     const nuevoContacto = this.ContactoEmergenciaRepository.create(createContactoEmergenciaDto);
-    // Guardar el nuevo contacto en la base de datos
     return await this.ContactoEmergenciaRepository.save(nuevoContacto);
   }
 
-  // Método para obtener todos los contactos de emergencia
+  // Obtener todos los contactos de emergencia registrados
   async obtenerTodosLosContactos(): Promise<ContactoEmergencia[]> {
     return await this.ContactoEmergenciaRepository.find();
   }
 
-  // Método para obtener un contacto de emergencia por su id
+  // Obtener un contacto de emergencia por su identificador único
   async obtenerContactoPorId(id: number): Promise<ContactoEmergencia> {
     const contacto = await this.ContactoEmergenciaRepository.findOneBy({ id_contacto: id });
     if (!contacto) {
@@ -35,21 +34,20 @@ export class ContactoEmergenciaService {
     return contacto;
   }
 
-  // Método para actualizar un contacto de emergencia por su id
+  // Actualizar los datos de un contacto de emergencia existente por su id
   async actualizarContacto(id: number, updateContactoEmergenciaDto: UpdateContactoEmergenciaDto): Promise<ContactoEmergencia> {
     const contacto = await this.ContactoEmergenciaRepository.preload({
       id_contacto: id,
       ...updateContactoEmergenciaDto,
     });
     if (!contacto) {
-      // Lanzar excepción si no se encuentra el contacto a actualizar
+      // Lanzar excepción si no se encuentra el contacto para actualizar
       throw new NotFoundException(`Contacto de emergencia con id ${id} no encontrado para actualizar`);
     }
-    // Guardar los cambios en la base de datos
     return await this.ContactoEmergenciaRepository.save(contacto);
   }
 
-  // Método para eliminar un contacto de emergencia por su id
+  // Eliminar un contacto de emergencia por su id
   async eliminarContacto(id: number): Promise<void> {
     const resultado = await this.ContactoEmergenciaRepository.delete(id);
     if (resultado.affected === 0) {
@@ -58,14 +56,14 @@ export class ContactoEmergenciaService {
     }
   }
 
-  // Método para buscar contactos por nombre parcial
+  // Buscar contactos por nombre parcial
   async buscarContactosPorNombre(nombre: string): Promise<ContactoEmergencia[]> {
     return await this.ContactoEmergenciaRepository.find({
       where: { nombre: Like(`%${nombre}%`) },
     });
   }
 
-  // Método para obtener contactos por id_huesped
+  // Obtener contactos filtrados por id_huesped
   async obtenerContactosPorHuesped(id_huesped: number): Promise<ContactoEmergencia[]> {
     return await this.ContactoEmergenciaRepository.find({
       where: { id_huesped },

@@ -6,12 +6,14 @@ import { RolesGuard } from 'src/auth/roles.guard';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
 
+// Controlador para manejar las rutas relacionadas con la entidad Habitacion
+// Protegido con autenticación JWT y control de roles
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('habitacion')
 export class HabitacionController {
   constructor(private readonly habitacionService: HabitacionService) {}
 
-  // Crear una nueva habitación
+  // Crear una nueva habitación (solo admin)
   // POST /habitacion
   @Post()
   @Roles('admin')
@@ -54,7 +56,7 @@ export class HabitacionController {
   GET http://localhost:4000/habitacion/1
   */
 
-  // Actualizar una habitación por ID
+  // Actualizar una habitación por ID (solo admin)
   // PUT /habitacion/:id
   // Cuerpo de la petición: JSON con los campos a actualizar según UpdateHabitacionDto
   @Put(':id')
@@ -72,7 +74,7 @@ export class HabitacionController {
   }
   */
 
-  // Eliminar una habitación por ID
+  // Eliminar una habitación por ID (solo admin)
   // DELETE /habitacion/:id
   @Delete(':id')
   @Roles('admin')

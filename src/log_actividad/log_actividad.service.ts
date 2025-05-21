@@ -8,24 +8,23 @@ import { Repository, Like } from 'typeorm';
 @Injectable()
 export class LogActividadService {
   constructor(
-    // Inyección del repositorio para acceder a la base de datos
+    // Inyección del repositorio para acceso a la base de datos MySQL con TypeORM
     @InjectRepository(LogActividad, 'austral')
     private LogActividadRepository: Repository<LogActividad>,
   ) {}
 
-  // Método para crear un nuevo log de actividad
+  // Crear un nuevo log de actividad en la base de datos
   async crearLog(createLogActividadDto: CreateLogActividadDto): Promise<LogActividad> {
     const nuevoLog = this.LogActividadRepository.create(createLogActividadDto);
-    // Guardar el nuevo log en la base de datos
     return await this.LogActividadRepository.save(nuevoLog);
   }
 
-  // Método para obtener todos los logs de actividad
+  // Obtener todos los logs de actividad registrados
   async obtenerTodosLosLogs(): Promise<LogActividad[]> {
     return await this.LogActividadRepository.find();
   }
 
-  // Método para obtener un log de actividad por su id
+  // Obtener un log de actividad por su identificador único
   async obtenerLogPorId(id_log: number): Promise<LogActividad> {
     const log = await this.LogActividadRepository.findOneBy({ id_log });
     if (!log) {
@@ -35,21 +34,20 @@ export class LogActividadService {
     return log;
   }
 
-  // Método para actualizar un log de actividad por su id
+  // Actualizar los datos de un log de actividad existente por su id
   async actualizarLog(id_log: number, updateLogActividadDto: UpdateLogActividadDto): Promise<LogActividad> {
     const log = await this.LogActividadRepository.preload({
       id_log: id_log,
       ...updateLogActividadDto,
     });
     if (!log) {
-      // Lanzar excepción si no se encuentra el log a actualizar
+      // Lanzar excepción si no se encuentra el log para actualizar
       throw new NotFoundException(`Log de actividad con id ${id_log} no encontrado para actualizar`);
     }
-    // Guardar los cambios en la base de datos
     return await this.LogActividadRepository.save(log);
   }
 
-  // Método para eliminar un log de actividad por su id
+  // Eliminar un log de actividad por su id
   async eliminarLog(id_log: number): Promise<void> {
     const resultado = await this.LogActividadRepository.delete(id_log);
     if (resultado.affected === 0) {
@@ -58,14 +56,14 @@ export class LogActividadService {
     }
   }
 
-  // Método para obtener logs por id_usuario
+  // Obtener logs filtrados por id_usuario
   async obtenerLogsPorUsuario(id_usuario: number): Promise<LogActividad[]> {
     return await this.LogActividadRepository.find({
       where: { id_usuario },
     });
   }
 
-  // Método para buscar logs por acción parcial
+  // Buscar logs filtrados por acción parcial
   async buscarLogsPorAccion(accion: string): Promise<LogActividad[]> {
     return await this.LogActividadRepository.find({
       where: { accion: Like(`%${accion}%`) },

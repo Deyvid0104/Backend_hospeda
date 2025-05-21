@@ -3,6 +3,7 @@ import { FacturaService } from './factura.service';
 import { CreateFacturaDto } from './dto/create-factura.dto';
 import { UpdateFacturaDto } from './dto/update-factura.dto';
 
+// Controlador para manejar las rutas relacionadas con la entidad Factura
 @Controller('factura')
 export class FacturaController {
   constructor(private readonly facturaService: FacturaService) {}

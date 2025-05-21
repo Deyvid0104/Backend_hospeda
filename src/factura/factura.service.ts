@@ -8,24 +8,23 @@ import { Repository, Between } from 'typeorm';
 @Injectable()
 export class FacturaService {
   constructor(
-    // Inyección del repositorio para acceder a la base de datos
+    // Inyección del repositorio para acceder a la base de datos MySQL con TypeORM
     @InjectRepository(Factura, 'austral')
     private FacturaRepository: Repository<Factura>,
   ) {}
 
-  // Método para crear una nueva factura
+  // Crear una nueva factura en la base de datos
   async crearFactura(createFacturaDto: CreateFacturaDto): Promise<Factura> {
     const nuevaFactura = this.FacturaRepository.create(createFacturaDto);
-    // Guardar la nueva factura en la base de datos
     return await this.FacturaRepository.save(nuevaFactura);
   }
 
-  // Método para obtener todas las facturas
+  // Obtener todas las facturas registradas
   async obtenerTodasLasFacturas(): Promise<Factura[]> {
     return await this.FacturaRepository.find();
   }
 
-  // Método para obtener una factura por su id
+  // Obtener una factura por su identificador único
   async obtenerFacturaPorId(id: number): Promise<Factura> {
     const factura = await this.FacturaRepository.findOneBy({ id_factura: id });
     if (!factura) {
@@ -35,21 +34,20 @@ export class FacturaService {
     return factura;
   }
 
-  // Método para actualizar una factura por su id
+  // Actualizar los datos de una factura existente por su id
   async actualizarFactura(id: number, updateFacturaDto: UpdateFacturaDto): Promise<Factura> {
     const factura = await this.FacturaRepository.preload({
       id_factura: id,
       ...updateFacturaDto,
     });
     if (!factura) {
-      // Lanzar excepción si no se encuentra la factura a actualizar
+      // Lanzar excepción si no se encuentra la factura para actualizar
       throw new NotFoundException(`Factura con id ${id} no encontrada para actualizar`);
     }
-    // Guardar los cambios en la base de datos
     return await this.FacturaRepository.save(factura);
   }
 
-  // Método para eliminar una factura por su id
+  // Eliminar una factura por su id
   async eliminarFactura(id: number): Promise<void> {
     const resultado = await this.FacturaRepository.delete(id);
     if (resultado.affected === 0) {
@@ -58,14 +56,14 @@ export class FacturaService {
     }
   }
 
-  // Método para obtener facturas por rango de monto_total
+  // Obtener facturas filtradas por rango de monto_total
   async obtenerFacturasPorRangoMonto(montoMin: number, montoMax: number): Promise<Factura[]> {
     return await this.FacturaRepository.find({
       where: { monto_total: Between(montoMin, montoMax) },
     });
   }
 
-  // Método para obtener facturas por método de pago
+  // Obtener facturas filtradas por método de pago
   async obtenerFacturasPorMetodoPago(metodo: 'efectivo' | 'tarjeta' | 'transferencia'): Promise<Factura[]> {
     return await this.FacturaRepository.find({ where: { metodo_pago: metodo } });
   }

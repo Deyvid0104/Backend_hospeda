@@ -2,13 +2,14 @@ import { DetalleReserva } from 'src/detalle_reserva/entities/detalle_reserva.ent
 import { HistorialMantenimiento } from 'src/historial_mantenimiento/entities/historial_mantenimiento.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, Index } from 'typeorm';
 
+// Entidad que representa la tabla Habitacion en la base de datos
 @Entity()
 export class Habitacion {
- // Identificador único de la habitación
+ // Identificador único de la habitación (clave primaria)
  @PrimaryGeneratedColumn()
  id_habitacion: number;
 
- // Número asignado a la habitación
+ // Número único asignado a la habitación
  @Index({ unique: true })
  @Column()
  numero: number;
@@ -27,7 +28,7 @@ export class Habitacion {
  })
  estado: 'libre' | 'ocupada' | 'limpieza' | 'mantenimiento';
 
- // Precio base de la habitación
+ // Precio base de la habitación con precisión decimal
  @Column({ type: 'decimal', precision: 10, scale: 2 })
  precio_base: number;
 
@@ -35,15 +36,15 @@ export class Habitacion {
  @Column()
  capacidad: number;
 
- // Foto de la habitación (URL o base64)
+ // Foto de la habitación (puede ser URL o base64), campo opcional
  @Column({ type: 'varchar', nullable: true })
  foto?: string;
 
- // Reservas asociadas a esta habitación
+ // Relación uno a muchos con detalles de reserva asociados a esta habitación
  @OneToMany(() => DetalleReserva, detalle => detalle.habitacion)
  detalles_reserva: DetalleReserva[];
 
- // Historial de mantenimiento de la habitación
+ // Relación uno a muchos con historial de mantenimiento de la habitación
  @OneToMany(() => HistorialMantenimiento, mantenimiento => mantenimiento.habitacion)
  historial_mantenimiento: HistorialMantenimiento[];
 }
