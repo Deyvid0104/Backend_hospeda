@@ -18,15 +18,13 @@ pipeline {
         stage('Build and Push Docker Image') {
             steps {
                 script {
-                    dir('Backend/hospeda') {
-                        // Construir imagen Docker usando el Dockerfile optimizado
-                        sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f deploy/Dockerfile ."
-                        sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
-                        
-                        // Push de la imagen
-                        sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
-                        sh "docker push ${DOCKER_IMAGE}:latest"
-                    }
+                    // Construir imagen Docker usando el Dockerfile
+                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f deploy/Dockerfile ."
+                    sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
+                    
+                    // Push de la imagen
+                    sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    sh "docker push ${DOCKER_IMAGE}:latest"
                 }
             }
         }
@@ -41,21 +39,19 @@ pipeline {
         stage('Deploy en k3s') {
             steps {
                 script {
-                    dir('Backend/hospeda') {
-                        // Actualizar la imagen en el deployment
-                        sh """
-                            sed -i 's|image: deyvid14/hospeda_backend:.*|image: ${DOCKER_IMAGE}:${DOCKER_TAG}|' deploy/backend-deployment.yaml
-                        """
+                    // Actualizar la imagen en el deployment
+                    sh """
+                        sed -i 's|image: deyvid14/hospeda_backend:.*|image: ${DOCKER_IMAGE}:${DOCKER_TAG}|' deploy/backend-deployment.yaml
+                    """
 
-                        // Aplicar configuraciones
-                        sh """
-                            kubectl apply -f deploy/backend-configmap.yaml
-                            kubectl apply -f deploy/backend-secret.yaml
-                            kubectl delete deploy hospeda-backend || true
-                            kubectl apply -f deploy/backend-deployment.yaml
-                            kubectl apply -f deploy/backend-service.yaml
-                        """
-                    }
+                    // Aplicar configuraciones
+                    sh """
+                        kubectl apply -f deploy/backend-configmap.yaml
+                        kubectl apply -f deploy/backend-secret.yaml
+                        kubectl delete deploy hospeda-backend || true
+                        kubectl apply -f deploy/backend-deployment.yaml
+                        kubectl apply -f deploy/backend-service.yaml
+                    """
                 }
             }
         }
@@ -68,6 +64,7 @@ pipeline {
         }
         failure {
             echo "Error en el despliegue"
+            echo "Revise los logs para más detalles"
         }
     }
 }
