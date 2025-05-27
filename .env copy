@@ -1,0 +1,7 @@
+PUERTO=4000
+DBNAME=austral
+URL=5.189.171.241
+PUERTO_DB=30306
+USUARIO=admin
+PASSWORD=austral
+PASSWORD_KEY=tu_secreto_jwtesta

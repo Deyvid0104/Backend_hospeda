@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hospeda-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hospeda-backend
+  template:
+    metadata:
+      labels:
+        app: hospeda-backend
+    spec:
+      containers:
+        - name: backend
+          image: deyvid14/hospeda_backend:v2
+          ports:
+            - containerPort: 4000
+          env:
+            # Variables desde ConfigMap
+            - name: PUERTO
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: PUERTO
+            - name: DBNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: DBNAME
+            - name: URL
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: URL
+            - name: PUERTO_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: PUERTO_DB
+
+            # Variables sensibles desde Secret
+            - name: USUARIO
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: USUARIO
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: PASSWORD
+            - name: PASSWORD_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: PASSWORD_KEY

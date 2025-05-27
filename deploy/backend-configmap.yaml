@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+data:
+  PUERTO: "4000"
+  DBNAME: "austral"
+  URL: "5.189.171.241"
+  PUERTO_DB: "30306"

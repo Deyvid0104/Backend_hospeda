@@ -2,6 +2,7 @@
  * Servicio ReservaService
  * Maneja la lógica de negocio para la entidad Reserva.
  * Incluye métodos para crear, obtener, actualizar y eliminar reservas.
+ * Se modifica para incluir la relación detalles_reserva en las consultas.
  */
 
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -10,7 +11,6 @@ import { UpdateReservaDto } from './dto/update-reserva.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Reserva } from './entities/reserva.entity';
 import { Repository } from 'typeorm';
-import { DetalleReserva } from '../detalle_reserva/entities/detalle_reserva.entity';
 
 @Injectable()
 export class ReservaService {
@@ -22,42 +22,8 @@ export class ReservaService {
 
   // Crear una nueva reserva en la base de datos
   async crearReserva(createReservaDto: CreateReservaDto): Promise<Reserva> {
-    // Iniciar transacción para asegurar que tanto la reserva como sus detalles se guarden correctamente
-    return await this.ReservaRepository.manager.transaction(async transactionalEntityManager => {
-      // Crear la reserva
-      const nuevaReserva = this.ReservaRepository.create({
-        fecha_entrada: createReservaDto.fecha_entrada,
-        fecha_salida: createReservaDto.fecha_salida,
-        estado: createReservaDto.estado,
-        id_huesped: createReservaDto.id_huesped
-      });
-      
-      // Guardar la reserva
-      const reservaGuardada = await transactionalEntityManager.save(Reserva, nuevaReserva);
-
-      // Si hay detalles de reserva, crearlos
-      if (createReservaDto.detalles_reserva && createReservaDto.detalles_reserva.length > 0) {
-        const detalles = createReservaDto.detalles_reserva.map(detalle => ({
-          ...detalle,
-          id_reserva: reservaGuardada.id_reserva
-        }));
-        
-        // Guardar los detalles
-        await transactionalEntityManager.save(DetalleReserva, detalles);
-      }
-
-      // Retornar la reserva con sus detalles
-      const reservaCompleta = await transactionalEntityManager.findOne(Reserva, {
-        where: { id_reserva: reservaGuardada.id_reserva },
-        relations: ['detalles_reserva']
-      });
-
-      if (!reservaCompleta) {
-        throw new NotFoundException(`Error al recuperar la reserva creada`);
-      }
-
-      return reservaCompleta;
-    });
+    const nuevaReserva = this.ReservaRepository.create(createReservaDto);
+    return await this.ReservaRepository.save(nuevaReserva);
   }
 
   // Obtener todas las reservas registradas, incluyendo detalles_reserva
@@ -72,6 +38,7 @@ export class ReservaService {
       relations: ['detalles_reserva'],
     });
     if (!reserva) {
+      // Lanzar excepción si no se encuentra la reserva
       throw new NotFoundException(`Reserva con id ${id} no encontrada`);
     }
     return reserva;
@@ -84,6 +51,7 @@ export class ReservaService {
       ...updateReservaDto,
     });
     if (!reserva) {
+      // Lanzar excepción si no se encuentra la reserva para actualizar
       throw new NotFoundException(`Reserva con id ${id} no encontrada para actualizar`);
     }
     return await this.ReservaRepository.save(reserva);
@@ -93,6 +61,7 @@ export class ReservaService {
   async eliminarReserva(id: number): Promise<void> {
     const resultado = await this.ReservaRepository.delete(id);
     if (resultado.affected === 0) {
+      // Lanzar excepción si no se encontró la reserva para eliminar
       throw new NotFoundException(`Reserva con id ${id} no encontrada para eliminar`);
     }
   }
