@@ -3,10 +3,13 @@ import { DetalleReservaService } from './detalle_reserva.service';
 import { DetalleReservaController } from './detalle_reserva.controller';
 import { DetalleReserva } from './entities/detalle_reserva.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Habitacion } from '../habitacion/entities/habitacion.entity';
+import { HabitacionModule } from '../habitacion/habitacion.module';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([DetalleReserva, Habitacion],"austral")],
+  imports: [
+    TypeOrmModule.forFeature([DetalleReserva], "austral"),
+    HabitacionModule
+  ],
   controllers: [DetalleReservaController],
   providers: [DetalleReservaService],
 })
