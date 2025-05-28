@@ -62,6 +62,7 @@ export class DetalleReservaService {
   async obtenerDetallesPorReserva(id_reserva: number): Promise<DetalleReserva[]> {
     return await this.DetalleReservaRepository.find({
       where: { id_reserva },
+      relations: ['habitacion'],
     });
   }
 
