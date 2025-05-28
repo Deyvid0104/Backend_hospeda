@@ -75,8 +75,16 @@ export class DetalleReservaController {
   // Obtener detalles por id_reserva
   // GET /detalle-reserva/reserva?id_reserva=1
   @Get('reserva')
-  obtenerDetallesPorReserva(@Query('id_reserva') id_reserva: string) {
-    return this.detalleReservaService.obtenerDetallesPorReserva(+id_reserva);
+  async obtenerDetallesPorReserva(@Query('id_reserva') id_reserva: string) {
+    try {
+      console.log(`Buscando detalles para reserva ${id_reserva}`);
+      const detalles = await this.detalleReservaService.obtenerDetallesPorReserva(+id_reserva);
+      console.log('Detalles encontrados:', JSON.stringify(detalles, null, 2));
+      return detalles;
+    } catch (error) {
+      console.error('Error al obtener detalles de reserva:', error);
+      throw error;
+    }
   }
   /*
   Ejemplo:

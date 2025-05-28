@@ -60,14 +60,28 @@ export class DetalleReservaService {
 
   // Método para obtener detalles por id_reserva
   async obtenerDetallesPorReserva(id_reserva: number): Promise<DetalleReserva[]> {
-    const detalles = await this.DetalleReservaRepository
-      .createQueryBuilder('detalle')
-      .leftJoinAndSelect('detalle.habitacion', 'habitacion')
-      .where('detalle.id_reserva = :id_reserva', { id_reserva })
-      .getMany();
+    try {
+      console.log('Iniciando consulta para obtener detalles de reserva:', id_reserva);
+      
+      const detalles = await this.DetalleReservaRepository.find({
+        where: { id_reserva },
+        relations: {
+          habitacion: true
+        }
+      });
+      
+      console.log('Detalles obtenidos:', JSON.stringify(detalles, null, 2));
+      
+      if (!detalles || detalles.length === 0) {
+        console.log(`No se encontraron detalles para la reserva ${id_reserva}`);
+        return [];
+      }
 
-    console.log('Detalles con habitaciones:', JSON.stringify(detalles, null, 2));
-    return detalles;
+      return detalles;
+    } catch (error) {
+      console.error('Error al obtener detalles de reserva:', error);
+      throw new Error(`Error al obtener detalles de reserva: ${error.message}`);
+    }
   }
 
   // Método para obtener detalles por id_habitacion
