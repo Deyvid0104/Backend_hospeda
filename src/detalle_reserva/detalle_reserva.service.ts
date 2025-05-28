@@ -60,10 +60,14 @@ export class DetalleReservaService {
 
   // Método para obtener detalles por id_reserva
   async obtenerDetallesPorReserva(id_reserva: number): Promise<DetalleReserva[]> {
-    return await this.DetalleReservaRepository.find({
-      where: { id_reserva },
-      relations: ['habitacion'],
-    });
+    const detalles = await this.DetalleReservaRepository
+      .createQueryBuilder('detalle')
+      .leftJoinAndSelect('detalle.habitacion', 'habitacion')
+      .where('detalle.id_reserva = :id_reserva', { id_reserva })
+      .getMany();
+
+    console.log('Detalles con habitaciones:', JSON.stringify(detalles, null, 2));
+    return detalles;
   }
 
   // Método para obtener detalles por id_habitacion
