@@ -63,23 +63,39 @@ export class DetalleReservaService {
     try {
       console.log('Iniciando consulta para obtener detalles de reserva:', id_reserva);
       
-      const detalles = await this.DetalleReservaRepository.find({
-        where: { id_reserva },
-        relations: {
-          habitacion: true
-        }
+      // Primero intentamos obtener solo los detalles sin relaciones
+      const detallesBase = await this.DetalleReservaRepository.find({
+        where: { id_reserva }
       });
       
-      console.log('Detalles obtenidos:', JSON.stringify(detalles, null, 2));
+      console.log('Detalles base encontrados:', JSON.stringify(detallesBase, null, 2));
       
-      if (!detalles || detalles.length === 0) {
+      if (!detallesBase || detallesBase.length === 0) {
         console.log(`No se encontraron detalles para la reserva ${id_reserva}`);
         return [];
       }
 
-      return detalles;
+      // Si encontramos detalles, ahora intentamos cargar las habitaciones
+      const detallesConHabitaciones = await Promise.all(
+        detallesBase.map(async (detalle) => {
+          try {
+            const detalleCompleto = await this.DetalleReservaRepository.findOne({
+              where: { id_detalle: detalle.id_detalle },
+              relations: ['habitacion']
+            });
+            console.log(`Detalle completo para id ${detalle.id_detalle}:`, JSON.stringify(detalleCompleto, null, 2));
+            return detalleCompleto;
+          } catch (err) {
+            console.error(`Error al cargar habitación para detalle ${detalle.id_detalle}:`, err);
+            return detalle;
+          }
+        })
+      );
+
+      return detallesConHabitaciones.filter(d => d !== null);
     } catch (error) {
       console.error('Error al obtener detalles de reserva:', error);
+      console.error('Stack trace:', error.stack);
       throw new Error(`Error al obtener detalles de reserva: ${error.message}`);
     }
   }
