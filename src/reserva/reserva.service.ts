@@ -49,7 +49,7 @@ export class ReservaService {
       // Retornar la reserva con sus detalles
       const reservaCompleta = await transactionalEntityManager.findOne(Reserva, {
         where: { id_reserva: reservaGuardada.id_reserva },
-        relations: ['detalles_reserva']
+        relations: ['detalles_reserva', 'detalles_reserva.habitacion']
       });
 
       if (!reservaCompleta) {
@@ -62,14 +62,19 @@ export class ReservaService {
 
   // Obtener todas las reservas registradas, incluyendo detalles_reserva
   async obtenerTodasLasReservas(): Promise<Reserva[]> {
-    return await this.ReservaRepository.find({ relations: ['detalles_reserva'] });
+    return await this.ReservaRepository.find({ 
+      relations: ['detalles_reserva', 'detalles_reserva.habitacion'],
+      order: {
+        id_reserva: 'DESC'
+      }
+    });
   }
 
   // Obtener una reserva por su identificador único, incluyendo detalles_reserva
   async obtenerReservaPorId(id: number): Promise<Reserva> {
     const reserva = await this.ReservaRepository.findOne({
       where: { id_reserva: id },
-      relations: ['detalles_reserva'],
+      relations: ['detalles_reserva', 'detalles_reserva.habitacion'],
     });
     if (!reserva) {
       throw new NotFoundException(`Reserva con id ${id} no encontrada`);
