@@ -62,12 +62,15 @@ export class ReservaService {
 
   // Obtener todas las reservas registradas, incluyendo detalles_reserva
   async obtenerTodasLasReservas(): Promise<Reserva[]> {
-    return await this.ReservaRepository.find({ 
-      relations: ['detalles_reserva', 'detalles_reserva.habitacion'],
-      order: {
-        id_reserva: 'DESC'
-      }
-    });
+    const reservas = await this.ReservaRepository
+      .createQueryBuilder('reserva')
+      .leftJoinAndSelect('reserva.detalles_reserva', 'detalles')
+      .leftJoinAndSelect('detalles.habitacion', 'habitacion')
+      .orderBy('reserva.id_reserva', 'DESC')
+      .getMany();
+
+    console.log('Reservas con detalles:', JSON.stringify(reservas, null, 2));
+    return reservas;
   }
 
   // Obtener una reserva por su identificador único, incluyendo detalles_reserva
