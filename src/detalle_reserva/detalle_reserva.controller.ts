@@ -78,27 +78,21 @@ export class DetalleReservaController {
   // GET /detalle-reserva/reserva?id_reserva=1
   @Get('reserva')
   async obtenerDetallesPorReserva(@Query('id_reserva') id_reserva: string) {
-    if (!id_reserva) {
-      console.error('ID de reserva no proporcionado');
-      throw new Error('ID de reserva es requerido');
-    }
-
     const idReservaNum = Number(id_reserva);
     if (isNaN(idReservaNum) || idReservaNum <= 0) {
       console.error(`ID de reserva inválido recibido: ${id_reserva}`);
-      throw new Error('ID de reserva debe ser un número válido mayor que 0');
+      throw new Error('ID de reserva inválido');
     }
-
     try {
       console.log(`Buscando detalles para reserva ${idReservaNum}`);
       const detalles = await this.detalleReservaService.obtenerDetallesPorReserva(idReservaNum);
       
-      // Log para detectar detalles con habitacion null después del fallback
-      const detallesNulos = detalles.filter(d => !d.habitacion);
-      if (detallesNulos.length > 0) {
-        console.warn(`${detallesNulos.length} detalles sin habitación después del fallback:`, 
-          detallesNulos.map(d => d.id_detalle));
-      }
+      // Log para detectar detalles con habitacion null
+      detalles.forEach(detalle => {
+        if (!detalle.habitacion) {
+          console.warn(`Detalle con id_detalle ${detalle.id_detalle} tiene habitacion null`);
+        }
+      });
       
       console.log('Detalles encontrados:', JSON.stringify(detalles, null, 2));
       return detalles;
@@ -115,35 +109,8 @@ export class DetalleReservaController {
   // Obtener detalles por id_habitacion
   // GET /detalle-reserva/habitacion?id_habitacion=101
   @Get('habitacion')
-  async obtenerDetallesPorHabitacion(@Query('id_habitacion') id_habitacion: string) {
-    if (!id_habitacion) {
-      console.error('ID de habitación no proporcionado');
-      throw new Error('ID de habitación es requerido');
-    }
-
-    const idHabitacionNum = Number(id_habitacion);
-    if (isNaN(idHabitacionNum) || idHabitacionNum <= 0) {
-      console.error(`ID de habitación inválido recibido: ${id_habitacion}`);
-      throw new Error('ID de habitación debe ser un número válido mayor que 0');
-    }
-
-    try {
-      console.log(`Buscando detalles para habitación ${idHabitacionNum}`);
-      const detalles = await this.detalleReservaService.obtenerDetallesPorHabitacion(idHabitacionNum);
-      
-      // Log para detectar detalles con habitacion null después del fallback
-      const detallesNulos = detalles.filter(d => !d.habitacion);
-      if (detallesNulos.length > 0) {
-        console.warn(`${detallesNulos.length} detalles sin habitación después del fallback:`, 
-          detallesNulos.map(d => d.id_detalle));
-      }
-      
-      console.log('Detalles encontrados:', JSON.stringify(detalles, null, 2));
-      return detalles;
-    } catch (error) {
-      console.error('Error al obtener detalles por habitación:', error);
-      throw error;
-    }
+  obtenerDetallesPorHabitacion(@Query('id_habitacion') id_habitacion: string) {
+    return this.detalleReservaService.obtenerDetallesPorHabitacion(+id_habitacion);
   }
   /*
   Ejemplo:
