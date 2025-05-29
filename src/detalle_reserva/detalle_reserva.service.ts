@@ -138,11 +138,12 @@ export class DetalleReservaService {
     try {
       console.log('Iniciando consulta para obtener detalles de reserva:', id_reserva);
       
-      // Obtener detalles con la relación de habitación en una sola consulta
-      const detalles = await this.DetalleReservaRepository.find({
-        where: { id_reserva },
-        relations: ['habitacion']
-      });
+      // Usar query builder para filtrar por la relación reserva.id
+      const detalles = await this.DetalleReservaRepository.createQueryBuilder('detalle')
+        .leftJoinAndSelect('detalle.habitacion', 'habitacion')
+        .leftJoin('detalle.reserva', 'reserva')
+        .where('reserva.id = :id_reserva', { id_reserva })
+        .getMany();
       
       console.log('Detalles encontrados:', JSON.stringify(detalles, null, 2));
       
