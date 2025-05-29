@@ -131,6 +131,10 @@ export class DetalleReservaService {
 
   // Método para obtener detalles por id_reserva
   async obtenerDetallesPorReserva(id_reserva: number): Promise<DetalleReserva[]> {
+    if (isNaN(id_reserva) || id_reserva <= 0) {
+      console.error(`ID de reserva inválido recibido en servicio: ${id_reserva}`);
+      throw new Error('ID de reserva inválido en servicio');
+    }
     try {
       console.log('Iniciando consulta para obtener detalles de reserva:', id_reserva);
       
