@@ -4,25 +4,23 @@ import { UpdateDetalleReservaDto } from './dto/update-detalle_reserva.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DetalleReserva } from './entities/detalle_reserva.entity';
 import { Repository } from 'typeorm';
+import { HabitacionService } from '../habitacion/habitacion.service';
 
 @Injectable()
 export class DetalleReservaService {
   constructor(
-    // Inyección del repositorio para acceder a la base de datos
     @InjectRepository(DetalleReserva, 'austral')
     private DetalleReservaRepository: Repository<DetalleReserva>,
+    private habitacionService: HabitacionService
   ) {}
 
-  // Método para crear un nuevo detalle de reserva
   async crearDetalle(createDetalleReservaDto: CreateDetalleReservaDto): Promise<DetalleReserva> {
     try {
       console.log('Iniciando creación de detalle de reserva:', createDetalleReservaDto);
       
       const nuevoDetalle = this.DetalleReservaRepository.create(createDetalleReservaDto);
-      // Guardar el nuevo detalle en la base de datos
       const detalleGuardado = await this.DetalleReservaRepository.save(nuevoDetalle);
       
-      // Cargar la relación con habitación
       const detalleConHabitacion = await this.DetalleReservaRepository.findOne({
         where: { id_detalle: detalleGuardado.id_detalle },
         relations: ['habitacion']
@@ -41,7 +39,6 @@ export class DetalleReservaService {
     }
   }
 
-  // Método para obtener todos los detalles de reserva
   async obtenerTodosLosDetalles(): Promise<DetalleReserva[]> {
     try {
       console.log('Iniciando consulta para obtener todos los detalles');
@@ -59,7 +56,6 @@ export class DetalleReservaService {
     }
   }
 
-  // Método para obtener un detalle de reserva por su id
   async obtenerDetallePorId(id: number): Promise<DetalleReserva> {
     try {
       console.log('Iniciando consulta para obtener detalle por ID:', id);
@@ -74,6 +70,14 @@ export class DetalleReservaService {
         throw new NotFoundException(`Detalle de reserva con id ${id} no encontrado`);
       }
 
+      if (!detalle.habitacion && detalle.id_habitacion) {
+        try {
+          detalle.habitacion = await this.habitacionService.obtenerHabitacionPorId(detalle.id_habitacion);
+        } catch (error) {
+          console.warn(`No se pudo cargar la habitación ${detalle.id_habitacion} para el detalle ${id}`);
+        }
+      }
+
       console.log('Detalle encontrado:', JSON.stringify(detalle, null, 2));
       return detalle;
     } catch (error) {
@@ -83,7 +87,6 @@ export class DetalleReservaService {
     }
   }
 
-  // Método para actualizar un detalle de reserva por su id
   async actualizarDetalle(id: number, updateDetalleReservaDto: UpdateDetalleReservaDto): Promise<DetalleReserva> {
     try {
       console.log('Iniciando actualización de detalle de reserva:', { id, updateDetalleReservaDto });
@@ -98,10 +101,8 @@ export class DetalleReservaService {
         throw new NotFoundException(`Detalle de reserva con id ${id} no encontrado para actualizar`);
       }
 
-      // Guardar los cambios en la base de datos
       const detalleActualizado = await this.DetalleReservaRepository.save(detalle);
       
-      // Recargar el detalle con la relación de habitación
       const detalleConHabitacion = await this.DetalleReservaRepository.findOne({
         where: { id_detalle: detalleActualizado.id_detalle },
         relations: ['habitacion']
@@ -109,6 +110,14 @@ export class DetalleReservaService {
 
       if (!detalleConHabitacion) {
         throw new NotFoundException(`No se pudo cargar el detalle actualizado con id ${id}`);
+      }
+
+      if (!detalleConHabitacion.habitacion && detalleConHabitacion.id_habitacion) {
+        try {
+          detalleConHabitacion.habitacion = await this.habitacionService.obtenerHabitacionPorId(detalleConHabitacion.id_habitacion);
+        } catch (error) {
+          console.warn(`No se pudo cargar la habitación ${detalleConHabitacion.id_habitacion} para el detalle ${id}`);
+        }
       }
 
       console.log('Detalle actualizado:', JSON.stringify(detalleConHabitacion, null, 2));
@@ -120,16 +129,13 @@ export class DetalleReservaService {
     }
   }
 
-  // Método para eliminar un detalle de reserva por su id
   async eliminarDetalle(id: number): Promise<void> {
     const resultado = await this.DetalleReservaRepository.delete(id);
     if (resultado.affected === 0) {
-      // Lanzar excepción si no se encontró el detalle para eliminar
       throw new NotFoundException(`Detalle de reserva con id ${id} no encontrado para eliminar`);
     }
   }
 
-  // Método para obtener detalles por id_reserva
   async obtenerDetallesPorReserva(id_reserva: number): Promise<DetalleReserva[]> {
     if (isNaN(id_reserva) || id_reserva <= 0) {
       console.error(`ID de reserva inválido recibido en servicio: ${id_reserva}`);
@@ -138,11 +144,20 @@ export class DetalleReservaService {
     try {
       console.log('Iniciando consulta para obtener detalles de reserva:', id_reserva);
       
-      // Obtener detalles con la relación de habitación en una sola consulta
       const detalles = await this.DetalleReservaRepository.find({
         where: { id_reserva },
         relations: ['habitacion']
       });
+
+      for (const detalle of detalles) {
+        if (!detalle.habitacion && detalle.id_habitacion) {
+          try {
+            detalle.habitacion = await this.habitacionService.obtenerHabitacionPorId(detalle.id_habitacion);
+          } catch (error) {
+            console.warn(`No se pudo cargar la habitación ${detalle.id_habitacion} para el detalle ${detalle.id_detalle}`);
+          }
+        }
+      }
       
       console.log('Detalles encontrados:', JSON.stringify(detalles, null, 2));
       
@@ -159,7 +174,6 @@ export class DetalleReservaService {
     }
   }
 
-  // Método para obtener detalles por id_habitacion
   async obtenerDetallesPorHabitacion(id_habitacion: number): Promise<DetalleReserva[]> {
     try {
       console.log('Iniciando consulta para obtener detalles por habitación:', id_habitacion);
@@ -168,6 +182,16 @@ export class DetalleReservaService {
         where: { id_habitacion },
         relations: ['habitacion']
       });
+
+      for (const detalle of detalles) {
+        if (!detalle.habitacion && detalle.id_habitacion) {
+          try {
+            detalle.habitacion = await this.habitacionService.obtenerHabitacionPorId(detalle.id_habitacion);
+          } catch (error) {
+            console.warn(`No se pudo cargar la habitación ${detalle.id_habitacion} para el detalle ${detalle.id_detalle}`);
+          }
+        }
+      }
       
       console.log('Detalles encontrados:', JSON.stringify(detalles, null, 2));
       return detalles;
