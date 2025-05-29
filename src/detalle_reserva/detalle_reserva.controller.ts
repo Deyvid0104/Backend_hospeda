@@ -78,9 +78,14 @@ export class DetalleReservaController {
   // GET /detalle-reserva/reserva?id_reserva=1
   @Get('reserva')
   async obtenerDetallesPorReserva(@Query('id_reserva') id_reserva: string) {
+    const idReservaNum = Number(id_reserva);
+    if (isNaN(idReservaNum) || idReservaNum <= 0) {
+      console.error(`ID de reserva inválido recibido: ${id_reserva}`);
+      throw new Error('ID de reserva inválido');
+    }
     try {
-      console.log(`Buscando detalles para reserva ${id_reserva}`);
-      const detalles = await this.detalleReservaService.obtenerDetallesPorReserva(+id_reserva);
+      console.log(`Buscando detalles para reserva ${idReservaNum}`);
+      const detalles = await this.detalleReservaService.obtenerDetallesPorReserva(idReservaNum);
       console.log('Detalles encontrados:', JSON.stringify(detalles, null, 2));
       return detalles;
     } catch (error) {
