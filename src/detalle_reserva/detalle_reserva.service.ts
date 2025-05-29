@@ -4,14 +4,12 @@ import { UpdateDetalleReservaDto } from './dto/update-detalle_reserva.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DetalleReserva } from './entities/detalle_reserva.entity';
 import { Repository } from 'typeorm';
-import { HabitacionService } from '../habitacion/habitacion.service';
 
 @Injectable()
 export class DetalleReservaService {
   constructor(
     @InjectRepository(DetalleReserva, 'austral')
-    private DetalleReservaRepository: Repository<DetalleReserva>,
-    private habitacionService: HabitacionService
+    private DetalleReservaRepository: Repository<DetalleReserva>
   ) {}
 
   async crearDetalle(createDetalleReservaDto: CreateDetalleReservaDto): Promise<DetalleReserva> {
@@ -70,14 +68,6 @@ export class DetalleReservaService {
         throw new NotFoundException(`Detalle de reserva con id ${id} no encontrado`);
       }
 
-      if (!detalle.habitacion && detalle.id_habitacion) {
-        try {
-          detalle.habitacion = await this.habitacionService.obtenerHabitacionPorId(detalle.id_habitacion);
-        } catch (error) {
-          console.warn(`No se pudo cargar la habitación ${detalle.id_habitacion} para el detalle ${id}`);
-        }
-      }
-
       console.log('Detalle encontrado:', JSON.stringify(detalle, null, 2));
       return detalle;
     } catch (error) {
@@ -112,14 +102,6 @@ export class DetalleReservaService {
         throw new NotFoundException(`No se pudo cargar el detalle actualizado con id ${id}`);
       }
 
-      if (!detalleConHabitacion.habitacion && detalleConHabitacion.id_habitacion) {
-        try {
-          detalleConHabitacion.habitacion = await this.habitacionService.obtenerHabitacionPorId(detalleConHabitacion.id_habitacion);
-        } catch (error) {
-          console.warn(`No se pudo cargar la habitación ${detalleConHabitacion.id_habitacion} para el detalle ${id}`);
-        }
-      }
-
       console.log('Detalle actualizado:', JSON.stringify(detalleConHabitacion, null, 2));
       return detalleConHabitacion;
     } catch (error) {
@@ -148,16 +130,6 @@ export class DetalleReservaService {
         where: { id_reserva },
         relations: ['habitacion']
       });
-
-      for (const detalle of detalles) {
-        if (!detalle.habitacion && detalle.id_habitacion) {
-          try {
-            detalle.habitacion = await this.habitacionService.obtenerHabitacionPorId(detalle.id_habitacion);
-          } catch (error) {
-            console.warn(`No se pudo cargar la habitación ${detalle.id_habitacion} para el detalle ${detalle.id_detalle}`);
-          }
-        }
-      }
       
       console.log('Detalles encontrados:', JSON.stringify(detalles, null, 2));
       
@@ -182,16 +154,6 @@ export class DetalleReservaService {
         where: { id_habitacion },
         relations: ['habitacion']
       });
-
-      for (const detalle of detalles) {
-        if (!detalle.habitacion && detalle.id_habitacion) {
-          try {
-            detalle.habitacion = await this.habitacionService.obtenerHabitacionPorId(detalle.id_habitacion);
-          } catch (error) {
-            console.warn(`No se pudo cargar la habitación ${detalle.id_habitacion} para el detalle ${detalle.id_detalle}`);
-          }
-        }
-      }
       
       console.log('Detalles encontrados:', JSON.stringify(detalles, null, 2));
       return detalles;
