@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { Reserva } from 'src/reserva/entities/reserva.entity';
 import { Habitacion } from 'src/habitacion/entities/habitacion.entity';
 
@@ -26,11 +26,9 @@ export class DetalleReserva {
 
  // Relación ManyToOne con la entidad Reserva
  @ManyToOne(() => Reserva, reserva => reserva.detalles_reserva)
- @JoinColumn({ name: 'id_reserva' })
  reserva: Reserva;
 
  // Relación ManyToOne con la entidad Habitacion
  @ManyToOne(() => Habitacion, habitacion => habitacion.detalles_reserva)
- @JoinColumn({ name: 'id_habitacion' })
  habitacion: Habitacion;
 }
