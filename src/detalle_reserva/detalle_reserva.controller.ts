@@ -1,11 +1,10 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Query, UseInterceptors } from '@nestjs/common';
 import { ErrorInterceptor } from '../interceptors/error.interceptor';
-
-@UseInterceptors(ErrorInterceptor)
 import { DetalleReservaService } from './detalle_reserva.service';
 import { CreateDetalleReservaDto } from './dto/create-detalle_reserva.dto';
 import { UpdateDetalleReservaDto } from './dto/update-detalle_reserva.dto';
 
+@UseInterceptors(ErrorInterceptor)
 @Controller('detalle-reserva')
 export class DetalleReservaController {
   constructor(private readonly detalleReservaService: DetalleReservaService) {}
