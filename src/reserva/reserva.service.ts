@@ -66,6 +66,7 @@ export class ReservaService {
       .createQueryBuilder('reserva')
       .leftJoinAndSelect('reserva.detalles_reserva', 'detalles')
       .leftJoinAndSelect('detalles.habitacion', 'habitacion')
+      .leftJoinAndSelect('reserva.huesped', 'huesped')
       .orderBy('reserva.id_reserva', 'DESC')
       .getMany();
 
