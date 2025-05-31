@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Query, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query, UseInterceptors, BadRequestException } from '@nestjs/common';
 import { ErrorInterceptor } from '../interceptors/error.interceptor';
 import { DetalleReservaService } from './detalle_reserva.service';
 import { CreateDetalleReservaDto } from './dto/create-detalle_reserva.dto';
@@ -81,7 +81,7 @@ export class DetalleReservaController {
     const idReservaNum = Number(id_reserva);
     if (isNaN(idReservaNum) || idReservaNum <= 0) {
       console.error(`ID de reserva inválido recibido: ${id_reserva}`);
-      throw new Error('ID de reserva inválido');
+      throw new BadRequestException('ID de reserva inválido');
     }
     try {
       console.log(`Buscando detalles para reserva ${idReservaNum}`);
