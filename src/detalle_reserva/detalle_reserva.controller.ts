@@ -78,6 +78,10 @@ export class DetalleReservaController {
   // GET /detalle-reserva/reserva?id_reserva=1
   @Get('reserva')
   async obtenerDetallesPorReserva(@Query('id_reserva') id_reserva: string) {
+    if (!id_reserva) {
+      console.error('No se recibió el parámetro id_reserva en la consulta');
+      throw new BadRequestException('Parámetro id_reserva es requerido');
+    }
     const idReservaNum = Number(id_reserva);
     if (isNaN(idReservaNum) || idReservaNum <= 0) {
       console.error(`ID de reserva inválido recibido: ${id_reserva}`);
