@@ -77,7 +77,7 @@ export class ReservaService {
   async obtenerReservaPorId(id: number): Promise<Reserva> {
     const reserva = await this.ReservaRepository.findOne({
       where: { id_reserva: id },
-      relations: ['detalles_reserva', 'detalles_reserva.habitacion'],
+      relations: ['detalles_reserva', 'detalles_reserva.habitacion', 'huesped'],
     });
     if (!reserva) {
       throw new NotFoundException(`Reserva con id ${id} no encontrada`);
