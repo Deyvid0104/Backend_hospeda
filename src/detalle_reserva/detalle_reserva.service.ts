@@ -126,10 +126,10 @@ export class DetalleReservaService {
     try {
       console.log('Iniciando consulta para obtener detalles de reserva:', id_reserva);
       
-      const detalles = await this.DetalleReservaRepository.find({
-        where: { id_reserva },
-        relations: ['habitacion']
-      });
+      const detalles = await this.DetalleReservaRepository.createQueryBuilder('detalle')
+        .leftJoinAndSelect('detalle.habitacion', 'habitacion')
+        .where('detalle.id_reserva = :id_reserva', { id_reserva })
+        .getMany();
       
       console.log('Detalles encontrados:', JSON.stringify(detalles, null, 2));
       
