@@ -77,7 +77,9 @@ export class DetalleReservaController {
   // Obtener detalles por id_reserva
   // GET /detalle-reserva/reserva?id_reserva=1
   @Get('reserva')
-  async obtenerDetallesPorReserva(@Query('id_reserva') id_reserva: string) {
+  async obtenerDetallesPorReserva(@Query() query: any) {
+    console.log('Parámetros de consulta recibidos en backend:', query);
+    const id_reserva = query.id_reserva;
     if (!id_reserva) {
       console.error('No se recibió el parámetro id_reserva en la consulta');
       throw new BadRequestException('Parámetro id_reserva es requerido');

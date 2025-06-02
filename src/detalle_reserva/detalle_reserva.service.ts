@@ -174,6 +174,10 @@ export class DetalleReservaService {
       console.log('Iniciando consulta para obtener detalles de reserva:', id_reserva);
       console.log('Valor de id_reserva antes de la consulta:', id_reserva);
       
+      // Log para verificar tipo y valor exacto
+      console.log('Tipo de id_reserva:', typeof id_reserva);
+      console.log('Valor exacto de id_reserva:', id_reserva);
+      
       const detalles = await this.DetalleReservaRepository.createQueryBuilder('detalle')
         .leftJoinAndSelect('detalle.habitacion', 'habitacion')
         .leftJoinAndSelect('detalle.reserva', 'reserva')
