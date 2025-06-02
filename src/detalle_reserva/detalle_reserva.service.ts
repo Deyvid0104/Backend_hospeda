@@ -177,7 +177,7 @@ export class DetalleReservaService {
       const detalles = await this.DetalleReservaRepository.createQueryBuilder('detalle')
         .leftJoinAndSelect('detalle.habitacion', 'habitacion')
         .leftJoinAndSelect('detalle.reserva', 'reserva')
-        .where('reserva.id = :id_reserva', { id_reserva })
+        .where('reserva.id_reserva = :id_reserva', { id_reserva })
         .getMany();
       
       console.log('Detalles encontrados:', JSON.stringify(detalles, null, 2));
@@ -201,7 +201,7 @@ export class DetalleReservaService {
       
       const detalles = await this.DetalleReservaRepository.createQueryBuilder('detalle')
         .leftJoinAndSelect('detalle.habitacion', 'habitacion')
-        .where('habitacion.id = :id_habitacion', { id_habitacion })
+        .where('habitacion.id_habitacion = :id_habitacion', { id_habitacion })
         .getMany();
       
       console.log('Detalles encontrados:', JSON.stringify(detalles, null, 2));
