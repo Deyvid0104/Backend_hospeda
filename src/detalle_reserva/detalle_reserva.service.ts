@@ -3,22 +3,44 @@ import { CreateDetalleReservaDto } from './dto/create-detalle_reserva.dto';
 import { UpdateDetalleReservaDto } from './dto/update-detalle_reserva.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DetalleReserva } from './entities/detalle_reserva.entity';
+import { Reserva } from 'src/reserva/entities/reserva.entity';
+import { Habitacion } from 'src/habitacion/entities/habitacion.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class DetalleReservaService {
   constructor(
     @InjectRepository(DetalleReserva, 'austral')
-    private DetalleReservaRepository: Repository<DetalleReserva>
+    private DetalleReservaRepository: Repository<DetalleReserva>,
+    @InjectRepository(Reserva, 'austral')
+    private reservaRepository: Repository<Reserva>,
+    @InjectRepository(Habitacion, 'austral')
+    private habitacionRepository: Repository<Habitacion>,
   ) {}
 
   async crearDetalle(createDetalleReservaDto: CreateDetalleReservaDto): Promise<DetalleReserva> {
     try {
       console.log('Iniciando creación de detalle de reserva:', createDetalleReservaDto);
-      
-      const nuevoDetalle = this.DetalleReservaRepository.create(createDetalleReservaDto);
+
+      const reserva = await this.reservaRepository.findOneBy({ id_reserva: createDetalleReservaDto.id_reserva });
+      if (!reserva) {
+        throw new NotFoundException(`Reserva con id ${createDetalleReservaDto.id_reserva} no encontrada`);
+      }
+
+      const habitacion = await this.habitacionRepository.findOneBy({ id_habitacion: createDetalleReservaDto.id_habitacion });
+      if (!habitacion) {
+        throw new NotFoundException(`Habitacion con id ${createDetalleReservaDto.id_habitacion} no encontrada`);
+      }
+
+      const nuevoDetalle = this.DetalleReservaRepository.create({
+        noches: createDetalleReservaDto.noches,
+        precio_aplicado: createDetalleReservaDto.precio_aplicado,
+        reserva,
+        habitacion,
+      });
+
       const detalleGuardado = await this.DetalleReservaRepository.save(nuevoDetalle);
-      
+
       const detalleConHabitacion = await this.DetalleReservaRepository.findOne({
         where: { id_detalle: detalleGuardado.id_detalle },
         relations: ['habitacion']
@@ -80,19 +102,44 @@ export class DetalleReservaService {
   async actualizarDetalle(id: number, updateDetalleReservaDto: UpdateDetalleReservaDto): Promise<DetalleReserva> {
     try {
       console.log('Iniciando actualización de detalle de reserva:', { id, updateDetalleReservaDto });
-      
-      const detalle = await this.DetalleReservaRepository.preload({
-        id_detalle: id,
-        ...updateDetalleReservaDto,
+
+      const detalleExistente = await this.DetalleReservaRepository.findOne({
+        where: { id_detalle: id },
       });
 
-      if (!detalle) {
+      if (!detalleExistente) {
         console.log(`No se encontró detalle con id ${id} para actualizar`);
         throw new NotFoundException(`Detalle de reserva con id ${id} no encontrado para actualizar`);
       }
 
-      const detalleActualizado = await this.DetalleReservaRepository.save(detalle);
-      
+      let reserva = detalleExistente.reserva;
+      let habitacion = detalleExistente.habitacion;
+
+      if (updateDetalleReservaDto.id_reserva) {
+        const reservaEncontrada = await this.reservaRepository.findOneBy({ id_reserva: updateDetalleReservaDto.id_reserva });
+        if (!reservaEncontrada) {
+          throw new NotFoundException(`Reserva con id ${updateDetalleReservaDto.id_reserva} no encontrada`);
+        }
+        reserva = reservaEncontrada;
+      }
+
+      if (updateDetalleReservaDto.id_habitacion) {
+        const habitacionEncontrada = await this.habitacionRepository.findOneBy({ id_habitacion: updateDetalleReservaDto.id_habitacion });
+        if (!habitacionEncontrada) {
+          throw new NotFoundException(`Habitacion con id ${updateDetalleReservaDto.id_habitacion} no encontrada`);
+        }
+        habitacion = habitacionEncontrada;
+      }
+
+      const detalleParaActualizar = this.DetalleReservaRepository.create({
+        ...detalleExistente,
+        ...updateDetalleReservaDto,
+        reserva,
+        habitacion,
+      });
+
+      const detalleActualizado = await this.DetalleReservaRepository.save(detalleParaActualizar);
+
       const detalleConHabitacion = await this.DetalleReservaRepository.findOne({
         where: { id_detalle: detalleActualizado.id_detalle },
         relations: ['habitacion']
@@ -129,7 +176,8 @@ export class DetalleReservaService {
       
       const detalles = await this.DetalleReservaRepository.createQueryBuilder('detalle')
         .leftJoinAndSelect('detalle.habitacion', 'habitacion')
-        .where('detalle.id_reserva = :id_reserva', { id_reserva })
+        .leftJoinAndSelect('detalle.reserva', 'reserva')
+        .where('reserva.id = :id_reserva', { id_reserva })
         .getMany();
       
       console.log('Detalles encontrados:', JSON.stringify(detalles, null, 2));
@@ -151,10 +199,10 @@ export class DetalleReservaService {
     try {
       console.log('Iniciando consulta para obtener detalles por habitación:', id_habitacion);
       
-      const detalles = await this.DetalleReservaRepository.find({
-        where: { id_habitacion },
-        relations: ['habitacion']
-      });
+      const detalles = await this.DetalleReservaRepository.createQueryBuilder('detalle')
+        .leftJoinAndSelect('detalle.habitacion', 'habitacion')
+        .where('habitacion.id = :id_habitacion', { id_habitacion })
+        .getMany();
       
       console.log('Detalles encontrados:', JSON.stringify(detalles, null, 2));
       return detalles;
