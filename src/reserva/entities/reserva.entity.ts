@@ -25,12 +25,9 @@ export class Reserva {
  })
  estado: 'confirmada' | 'cancelada';
 
- // Identificador del huésped asociado a la reserva
- @Column()
- id_huesped: number;
 
  // Relación ManyToOne con la entidad Huesped (muchas reservas pueden pertenecer a un huésped)
- @ManyToOne(() => Huesped, huesped => huesped.reservas)
+ @ManyToOne(() => Huesped, huesped => huesped.reservas, { eager: true })
  huesped: Huesped;
 
  // Relación OneToMany con la entidad DetalleReserva (una reserva puede tener varios detalles)

@@ -4,6 +4,8 @@ import { UpdateDetalleFacturaDto } from './dto/update-detalle_factura.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DetalleFactura } from './entities/detalle_factura.entity';
 import { Repository } from 'typeorm';
+import { Factura } from '../factura/entities/factura.entity';
+import { ServicioAdicional } from '../servicio_adicional/entities/servicio_adicional.entity';
 
 @Injectable()
 export class DetalleFacturaService {
@@ -11,11 +13,34 @@ export class DetalleFacturaService {
     // Inyección del repositorio para acceder a la base de datos
     @InjectRepository(DetalleFactura, 'austral')
     private DetalleFacturaRepository: Repository<DetalleFactura>,
+    @InjectRepository(Factura, 'austral')
+    private FacturaRepository: Repository<Factura>,
+    @InjectRepository(ServicioAdicional, 'austral')
+    private ServicioAdicionalRepository: Repository<ServicioAdicional>,
   ) {}
 
   // Método para crear un nuevo detalle de factura
   async crearDetalle(createDetalleFacturaDto: CreateDetalleFacturaDto): Promise<DetalleFactura> {
-    const nuevoDetalle = this.DetalleFacturaRepository.create(createDetalleFacturaDto);
+    // Buscar la factura por id_factura
+    const factura = await this.FacturaRepository.findOneBy({ id_factura: createDetalleFacturaDto.id_factura });
+    if (!factura) {
+      throw new NotFoundException(`Factura con id ${createDetalleFacturaDto.id_factura} no encontrada`);
+    }
+
+    // Buscar el servicio adicional por id_servicio
+    const servicio = await this.ServicioAdicionalRepository.findOneBy({ id_servicio: createDetalleFacturaDto.id_servicio });
+    if (!servicio) {
+      throw new NotFoundException(`Servicio adicional con id ${createDetalleFacturaDto.id_servicio} no encontrado`);
+    }
+
+    // Crear el detalle con las relaciones factura y servicio
+    const nuevoDetalle = this.DetalleFacturaRepository.create({
+      concepto: createDetalleFacturaDto.concepto,
+      cantidad: createDetalleFacturaDto.cantidad,
+      precio_unitario: createDetalleFacturaDto.precio_unitario,
+      factura: factura,
+      servicio: servicio,
+    });
     // Guardar el nuevo detalle en la base de datos
     return await this.DetalleFacturaRepository.save(nuevoDetalle);
   }
@@ -37,9 +62,32 @@ export class DetalleFacturaService {
 
   // Método para actualizar un detalle de factura por su id
   async actualizarDetalle(id: number, updateDetalleFacturaDto: UpdateDetalleFacturaDto): Promise<DetalleFactura> {
+    // Buscar la factura si se recibe id_factura
+    let factura: Factura | null | undefined = undefined;
+    if (updateDetalleFacturaDto.id_factura) {
+      factura = await this.FacturaRepository.findOneBy({ id_factura: updateDetalleFacturaDto.id_factura });
+      if (!factura) {
+        throw new NotFoundException(`Factura con id ${updateDetalleFacturaDto.id_factura} no encontrada`);
+      }
+    }
+
+    // Buscar el servicio adicional si se recibe id_servicio
+    let servicio: ServicioAdicional | null | undefined = undefined;
+    if (updateDetalleFacturaDto.id_servicio) {
+      servicio = await this.ServicioAdicionalRepository.findOneBy({ id_servicio: updateDetalleFacturaDto.id_servicio });
+      if (!servicio) {
+        throw new NotFoundException(`Servicio adicional con id ${updateDetalleFacturaDto.id_servicio} no encontrado`);
+      }
+    }
+
+    // Preload para actualizar el detalle
     const detalle = await this.DetalleFacturaRepository.preload({
       id_detalle_factura: id,
-      ...updateDetalleFacturaDto,
+      concepto: updateDetalleFacturaDto.concepto,
+      cantidad: updateDetalleFacturaDto.cantidad,
+      precio_unitario: updateDetalleFacturaDto.precio_unitario,
+      factura: factura ?? undefined,
+      servicio: servicio ?? undefined,
     });
     if (!detalle) {
       // Lanzar excepción si no se encuentra el detalle a actualizar
@@ -61,14 +109,16 @@ export class DetalleFacturaService {
   // Método para obtener detalles por id_factura
   async obtenerDetallesPorFactura(id_factura: number): Promise<DetalleFactura[]> {
     return await this.DetalleFacturaRepository.find({
-      where: { id_factura },
+      where: { factura: { id_factura: id_factura } },
+      relations: ['factura', 'servicio'],
     });
   }
 
   // Método para obtener detalles por id_servicio
   async obtenerDetallesPorServicio(id_servicio: number): Promise<DetalleFactura[]> {
     return await this.DetalleFacturaRepository.find({
-      where: { id_servicio },
+      where: { servicio: { id_servicio: id_servicio } },
+      relations: ['factura', 'servicio'],
     });
   }
 }

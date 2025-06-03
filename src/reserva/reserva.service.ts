@@ -11,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Reserva } from './entities/reserva.entity';
 import { Repository } from 'typeorm';
 import { DetalleReserva } from '../detalle_reserva/entities/detalle_reserva.entity';
+import { Huesped } from '../huesped/entities/huesped.entity';
 
 @Injectable()
 export class ReservaService {
@@ -18,18 +19,26 @@ export class ReservaService {
     // Inyección del repositorio para acceder a la base de datos MySQL con TypeORM
     @InjectRepository(Reserva, 'austral')
     private ReservaRepository: Repository<Reserva>,
+    @InjectRepository(Huesped, 'austral')
+    private HuespedRepository: Repository<Huesped>,
   ) {}
 
   // Crear una nueva reserva en la base de datos
   async crearReserva(createReservaDto: CreateReservaDto): Promise<Reserva> {
     // Iniciar transacción para asegurar que tanto la reserva como sus detalles se guarden correctamente
     return await this.ReservaRepository.manager.transaction(async transactionalEntityManager => {
-      // Crear la reserva
+      // Buscar el huésped por id_huesped
+      const huesped = await this.HuespedRepository.findOneBy({ id_huesped: createReservaDto.id_huesped });
+      if (!huesped) {
+        throw new NotFoundException(`Huesped con id ${createReservaDto.id_huesped} no encontrado`);
+      }
+
+      // Crear la reserva con la relación huesped
       const nuevaReserva = this.ReservaRepository.create({
         fecha_entrada: createReservaDto.fecha_entrada,
         fecha_salida: createReservaDto.fecha_salida,
         estado: createReservaDto.estado,
-        id_huesped: createReservaDto.id_huesped
+        huesped: huesped,
       });
       
       // Guardar la reserva
@@ -49,7 +58,7 @@ export class ReservaService {
       // Retornar la reserva con sus detalles
       const reservaCompleta = await transactionalEntityManager.findOne(Reserva, {
         where: { id_reserva: reservaGuardada.id_reserva },
-        relations: ['detalles_reserva', 'detalles_reserva.habitacion']
+        relations: ['detalles_reserva', 'detalles_reserva.habitacion', 'huesped']
       });
 
       if (!reservaCompleta) {
@@ -88,9 +97,20 @@ export class ReservaService {
 
   // Actualizar los datos de una reserva existente por su id
   async actualizarReserva(id: number, updateReservaDto: UpdateReservaDto): Promise<Reserva> {
+    // Si se recibe id_huesped, buscar el objeto huesped y asignar
+    let huesped: Huesped | null = null;
+    if (updateReservaDto.id_huesped) {
+      huesped = await this.HuespedRepository.findOneBy({ id_huesped: updateReservaDto.id_huesped });
+      if (!huesped) {
+        throw new NotFoundException(`Huesped con id ${updateReservaDto.id_huesped} no encontrado`);
+      }
+    }
+
+    // Preload para actualizar la reserva
     const reserva = await this.ReservaRepository.preload({
       id_reserva: id,
       ...updateReservaDto,
+      huesped: huesped ?? undefined,
     });
     if (!reserva) {
       throw new NotFoundException(`Reserva con id ${id} no encontrada para actualizar`);
