@@ -35,8 +35,8 @@ export class DetalleReservaService {
       const nuevoDetalle = this.DetalleReservaRepository.create({
         noches: createDetalleReservaDto.noches,
         precio_aplicado: createDetalleReservaDto.precio_aplicado,
-        reserva,
-        habitacion,
+        reserva: { id_reserva: reserva.id_reserva },
+        habitacion: { id_habitacion: habitacion.id_habitacion },
       });
 
       const detalleGuardado = await this.DetalleReservaRepository.save(nuevoDetalle);
