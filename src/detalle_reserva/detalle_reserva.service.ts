@@ -179,7 +179,7 @@ export class DetalleReservaService {
       console.log('Valor exacto de id_reserva:', id_reserva);
       
       const detalles = await this.DetalleReservaRepository.createQueryBuilder('detalle')
-        .leftJoinAndSelect('detalle.habitacion', 'habitacion')
+        .innerJoinAndSelect('detalle.habitacion', 'habitacion')
         .leftJoinAndSelect('detalle.reserva', 'reserva')
         .where('reserva.id_reserva = :id_reserva', { id_reserva })
         .getMany();
