@@ -180,7 +180,7 @@ export class DetalleReservaService {
       
       const detalles = await this.DetalleReservaRepository.createQueryBuilder('detalle')
         .innerJoinAndSelect('detalle.habitacion', 'habitacion')
-        .leftJoinAndSelect('detalle.reserva', 'reserva')
+        .innerJoinAndSelect('detalle.reserva', 'reserva')
         .where('reserva.id_reserva = :id_reserva', { id_reserva })
         .getMany();
       
