@@ -1,3 +1,9 @@
+/**
+ * Servicio LogActividadService
+ * Maneja la lógica de negocio para los logs de actividad.
+ * Incluye métodos para crear, obtener, actualizar y eliminar logs.
+ */
+
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateLogActividadDto } from './dto/create-log_actividad.dto';
 import { UpdateLogActividadDto } from './dto/update-log_actividad.dto';
@@ -13,18 +19,30 @@ export class LogActividadService {
     private LogActividadRepository: Repository<LogActividad>,
   ) {}
 
-  // Crear un nuevo log de actividad en la base de datos
+  /**
+   * Crea un nuevo log de actividad.
+   * @param createLogActividadDto DTO con datos del log.
+   * @returns El log creado.
+   */
   async crearLog(createLogActividadDto: CreateLogActividadDto): Promise<LogActividad> {
     const nuevoLog = this.LogActividadRepository.create(createLogActividadDto);
     return await this.LogActividadRepository.save(nuevoLog);
   }
 
-  // Obtener todos los logs de actividad registrados
+  /**
+   * Obtiene todos los logs de actividad registrados.
+   * @returns Lista de logs.
+   */
   async obtenerTodosLosLogs(): Promise<LogActividad[]> {
     return await this.LogActividadRepository.find();
   }
 
-  // Obtener un log de actividad por su identificador único
+  /**
+   * Obtiene un log de actividad por su identificador único.
+   * @param id_log ID del log.
+   * @returns El log encontrado.
+   * @throws NotFoundException si no se encuentra el log.
+   */
   async obtenerLogPorId(id_log: number): Promise<LogActividad> {
     const log = await this.LogActividadRepository.findOneBy({ id_log });
     if (!log) {
@@ -34,7 +52,13 @@ export class LogActividadService {
     return log;
   }
 
-  // Actualizar los datos de un log de actividad existente por su id
+  /**
+   * Actualiza los datos de un log de actividad existente por su id.
+   * @param id_log ID del log.
+   * @param updateLogActividadDto DTO con datos a actualizar.
+   * @returns El log actualizado.
+   * @throws NotFoundException si no se encuentra el log.
+   */
   async actualizarLog(id_log: number, updateLogActividadDto: UpdateLogActividadDto): Promise<LogActividad> {
     const log = await this.LogActividadRepository.preload({
       id_log: id_log,
@@ -47,7 +71,11 @@ export class LogActividadService {
     return await this.LogActividadRepository.save(log);
   }
 
-  // Eliminar un log de actividad por su id
+  /**
+   * Elimina un log de actividad por su id.
+   * @param id_log ID del log.
+   * @throws NotFoundException si no se encuentra el log.
+   */
   async eliminarLog(id_log: number): Promise<void> {
     const resultado = await this.LogActividadRepository.delete(id_log);
     if (resultado.affected === 0) {
@@ -56,14 +84,22 @@ export class LogActividadService {
     }
   }
 
-  // Obtener logs filtrados por id_usuario
+  /**
+   * Obtiene logs filtrados por id_usuario.
+   * @param id_usuario ID del usuario.
+   * @returns Lista de logs asociados.
+   */
   async obtenerLogsPorUsuario(id_usuario: number): Promise<LogActividad[]> {
     return await this.LogActividadRepository.find({
-      where: { id_usuario },
+      where: { usuario: { id_usuario } },
     });
   }
 
-  // Buscar logs filtrados por acción parcial
+  /**
+   * Busca logs filtrados por acción parcial.
+   * @param accion Acción parcial para búsqueda.
+   * @returns Lista de logs que coinciden.
+   */
   async buscarLogsPorAccion(accion: string): Promise<LogActividad[]> {
     return await this.LogActividadRepository.find({
       where: { accion: Like(`%${accion}%`) },

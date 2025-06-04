@@ -28,9 +28,9 @@ export class Factura {
  estado: 'pendiente' | 'pagada' | 'anulada';
 
  // Relación OneToOne con la entidad Reserva (una factura está asociada a una reserva)
- @OneToOne(() => Reserva, reserva => reserva.factura)
- @JoinColumn()
- reserva: Reserva;
+  @OneToOne(() => Reserva, reserva => reserva.factura)
+  @JoinColumn({ name: 'id_reserva' })
+  reserva: Reserva;
 
  // Relación OneToMany con la entidad DetalleFactura (una factura puede tener varios detalles)
  @OneToMany(() => DetalleFactura, detalle => detalle.factura)

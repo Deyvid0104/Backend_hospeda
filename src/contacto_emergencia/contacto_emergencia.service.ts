@@ -1,3 +1,9 @@
+/**
+ * Servicio ContactoEmergenciaService
+ * Maneja la lógica de negocio para los contactos de emergencia.
+ * Incluye métodos para crear, obtener, actualizar y eliminar contactos.
+ */
+
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateContactoEmergenciaDto } from './dto/create-contacto_emergencia.dto';
 import { UpdateContactoEmergenciaDto } from './dto/update-contacto_emergencia.dto';
@@ -13,18 +19,30 @@ export class ContactoEmergenciaService {
     private ContactoEmergenciaRepository: Repository<ContactoEmergencia>,
   ) {}
 
-  // Crear un nuevo contacto de emergencia en la base de datos
+  /**
+   * Crea un nuevo contacto de emergencia.
+   * @param createContactoEmergenciaDto DTO con datos del contacto.
+   * @returns El contacto creado.
+   */
   async crearContacto(createContactoEmergenciaDto: CreateContactoEmergenciaDto): Promise<ContactoEmergencia> {
     const nuevoContacto = this.ContactoEmergenciaRepository.create(createContactoEmergenciaDto);
     return await this.ContactoEmergenciaRepository.save(nuevoContacto);
   }
 
-  // Obtener todos los contactos de emergencia registrados
+  /**
+   * Obtiene todos los contactos de emergencia registrados.
+   * @returns Lista de contactos.
+   */
   async obtenerTodosLosContactos(): Promise<ContactoEmergencia[]> {
     return await this.ContactoEmergenciaRepository.find();
   }
 
-  // Obtener un contacto de emergencia por su identificador único
+  /**
+   * Obtiene un contacto de emergencia por su ID.
+   * @param id ID del contacto.
+   * @returns El contacto encontrado.
+   * @throws NotFoundException si no se encuentra el contacto.
+   */
   async obtenerContactoPorId(id: number): Promise<ContactoEmergencia> {
     const contacto = await this.ContactoEmergenciaRepository.findOneBy({ id_contacto: id });
     if (!contacto) {
@@ -34,7 +52,13 @@ export class ContactoEmergenciaService {
     return contacto;
   }
 
-  // Actualizar los datos de un contacto de emergencia existente por su id
+  /**
+   * Actualiza un contacto de emergencia existente.
+   * @param id ID del contacto a actualizar.
+   * @param updateContactoEmergenciaDto DTO con datos a actualizar.
+   * @returns El contacto actualizado.
+   * @throws NotFoundException si no se encuentra el contacto.
+   */
   async actualizarContacto(id: number, updateContactoEmergenciaDto: UpdateContactoEmergenciaDto): Promise<ContactoEmergencia> {
     const contacto = await this.ContactoEmergenciaRepository.preload({
       id_contacto: id,
@@ -47,7 +71,11 @@ export class ContactoEmergenciaService {
     return await this.ContactoEmergenciaRepository.save(contacto);
   }
 
-  // Eliminar un contacto de emergencia por su id
+  /**
+   * Elimina un contacto de emergencia por su ID.
+   * @param id ID del contacto a eliminar.
+   * @throws NotFoundException si no se encuentra el contacto.
+   */
   async eliminarContacto(id: number): Promise<void> {
     const resultado = await this.ContactoEmergenciaRepository.delete(id);
     if (resultado.affected === 0) {
@@ -56,17 +84,25 @@ export class ContactoEmergenciaService {
     }
   }
 
-  // Buscar contactos por nombre parcial
+  /**
+   * Busca contactos por nombre parcial.
+   * @param nombre Nombre parcial para búsqueda.
+   * @returns Lista de contactos que coinciden.
+   */
   async buscarContactosPorNombre(nombre: string): Promise<ContactoEmergencia[]> {
     return await this.ContactoEmergenciaRepository.find({
       where: { nombre: Like(`%${nombre}%`) },
     });
   }
 
-  // Obtener contactos filtrados por id_huesped
+  /**
+   * Obtiene contactos filtrados por ID de huésped.
+   * @param id_huesped ID del huésped.
+   * @returns Lista de contactos asociados al huésped.
+   */
   async obtenerContactosPorHuesped(id_huesped: number): Promise<ContactoEmergencia[]> {
     return await this.ContactoEmergenciaRepository.find({
-      where: { id_huesped },
+      where: { huesped: { id_huesped } },
     });
   }
 }

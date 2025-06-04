@@ -27,7 +27,7 @@ export class CreateReservaDto {
 
     // Identificador del huésped asociado
     @IsNumber()
-    id_huesped: number;
+    huespedId: number;
 
     // Detalles de la reserva (habitaciones)
     @IsArray()

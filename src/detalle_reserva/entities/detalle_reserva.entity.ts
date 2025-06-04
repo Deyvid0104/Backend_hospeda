@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Expose } from 'class-transformer';
 import { Reserva } from 'src/reserva/entities/reserva.entity';
 import { Habitacion } from 'src/habitacion/entities/habitacion.entity';
 

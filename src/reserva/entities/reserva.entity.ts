@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm';
+import { Expose } from 'class-transformer';
 import { Huesped } from 'src/huesped/entities/huesped.entity';
 import { DetalleReserva } from 'src/detalle_reserva/entities/detalle_reserva.entity';
 import { Factura } from 'src/factura/entities/factura.entity';
@@ -25,12 +26,9 @@ export class Reserva {
  })
  estado: 'confirmada' | 'cancelada';
 
- // Identificador del huésped asociado a la reserva
- @Column()
- id_huesped: number;
-
  // Relación ManyToOne con la entidad Huesped (muchas reservas pueden pertenecer a un huésped)
- @ManyToOne(() => Huesped, huesped => huesped.reservas)
+ @ManyToOne(() => Huesped, huesped => huesped.reservas, { eager: true })
+ @JoinColumn({ name: 'id_huesped' })
  huesped: Huesped;
 
  // Relación OneToMany con la entidad DetalleReserva (una reserva puede tener varios detalles)

@@ -1,15 +1,25 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 import { ReservaService } from './reserva.service';
 import { CreateReservaDto } from './dto/create-reserva.dto';
 import { UpdateReservaDto } from './dto/update-reserva.dto';
+import { Reserva } from './entities/reserva.entity';
 
-// Controlador para manejar las rutas relacionadas con la entidad Reserva
+
+/**
+ * Controlador ReservaController
+ * Maneja las rutas y solicitudes HTTP relacionadas con la entidad Reserva.
+ * Incluye endpoints para crear, obtener, actualizar y eliminar reservas.
+ */
 @Controller('reserva')
 export class ReservaController {
   constructor(private readonly reservaService: ReservaService) {}
 
-  // Crear una nueva reserva
-  // POST /reserva
+  /**
+   * Crea una nueva reserva.
+   * @param createReservaDto DTO con datos de la reserva.
+   * @returns La reserva creada.
+   */
   @Post()
   crearReserva(@Body() createReservaDto: CreateReservaDto) {
     return this.reservaService.crearReserva(createReservaDto);
@@ -26,31 +36,47 @@ export class ReservaController {
   }
   */
 
-  // Obtener todas las reservas
-  // GET /reserva
+  /**
+   * Obtiene todas las reservas.
+   * @returns Lista de reservas.
+   */
+
   @Get()
-  obtenerTodasLasReservas() {
-    return this.reservaService.obtenerTodasLasReservas();
+  async obtenerTodasLasReservas(
+    @Query('fecha_entrada') fecha_entrada?: string,
+    @Query('fecha_salida') fecha_salida?: string,
+    @Query('nombre_huesped') nombre_huesped?: string,
+  ) {
+    const filtros = { fecha_entrada, fecha_salida, nombre_huesped };
+    const reservas = await this.reservaService.obtenerTodasLasReservas(filtros.fecha_entrada, filtros.fecha_salida, filtros.nombre_huesped);
+    return plainToInstance(Reserva, reservas);
   }
   /*
   Ejemplo:
   GET http://localhost:4000/reserva
   */
 
-  // Obtener una reserva por ID
-  // GET /reserva/:id
+  /**
+   * Obtiene una reserva por su ID.
+   * @param id ID de la reserva.
+   * @returns La reserva encontrada.
+   */
   @Get(':id')
-  obtenerReservaPorId(@Param('id') id: string) {
-    return this.reservaService.obtenerReservaPorId(+id);
+  async obtenerReservaPorId(@Param('id') id: string) {
+    const reserva = await this.reservaService.obtenerReservaPorId(+id);
+    return plainToInstance(Reserva, reserva);
   }
   /*
   Ejemplo:
   GET http://localhost:4000/reserva/1
   */
 
-  // Actualizar una reserva por ID
-  // PUT /reserva/:id
-  // Cuerpo de la petición: JSON con los campos a actualizar según UpdateReservaDto
+  /**
+   * Actualiza una reserva por su ID.
+   * @param id ID de la reserva.
+   * @param updateReservaDto DTO con datos a actualizar.
+   * @returns La reserva actualizada.
+   */
   @Put(':id')
   actualizarReserva(@Param('id') id: string, @Body() updateReservaDto: UpdateReservaDto) {
     return this.reservaService.actualizarReserva(+id, updateReservaDto);
@@ -64,8 +90,11 @@ export class ReservaController {
   }
   */
 
-  // Eliminar una reserva por ID
-  // DELETE /reserva/:id
+  /**
+   * Elimina una reserva por su ID.
+   * @param id ID de la reserva.
+   * @returns Resultado de la eliminación.
+   */
   @Delete(':id')
   eliminarReserva(@Param('id') id: string) {
     return this.reservaService.eliminarReserva(+id);

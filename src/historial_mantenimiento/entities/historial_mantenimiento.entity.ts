@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Habitacion } from 'src/habitacion/entities/habitacion.entity';
 
 @Entity()
@@ -6,10 +6,6 @@ export class HistorialMantenimiento {
  // Identificador único del historial de mantenimiento
  @PrimaryGeneratedColumn()
  id_mantenimiento: number;
-
- // Identificador de la habitación asociada
- @Column()
- id_habitacion: number;
 
  // Fecha de inicio del mantenimiento
  @Column()
@@ -36,5 +32,6 @@ export class HistorialMantenimiento {
 
  // Relación ManyToOne con la entidad Habitacion
  @ManyToOne(() => Habitacion, habitacion => habitacion.historial_mantenimiento)
+ @JoinColumn({ name: 'id_habitacion' })
  habitacion: Habitacion;
 }

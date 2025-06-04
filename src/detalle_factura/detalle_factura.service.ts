@@ -1,3 +1,9 @@
+/**
+ * Servicio DetalleFacturaService
+ * Maneja la lógica de negocio para los detalles de factura.
+ * Incluye métodos para crear, obtener, actualizar y eliminar detalles.
+ */
+
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDetalleFacturaDto } from './dto/create-detalle_factura.dto';
 import { UpdateDetalleFacturaDto } from './dto/update-detalle_factura.dto';
@@ -13,19 +19,31 @@ export class DetalleFacturaService {
     private DetalleFacturaRepository: Repository<DetalleFactura>,
   ) {}
 
-  // Método para crear un nuevo detalle de factura
+  /**
+   * Crea un nuevo detalle de factura.
+   * @param createDetalleFacturaDto DTO con datos del detalle.
+   * @returns El detalle creado.
+   */
   async crearDetalle(createDetalleFacturaDto: CreateDetalleFacturaDto): Promise<DetalleFactura> {
     const nuevoDetalle = this.DetalleFacturaRepository.create(createDetalleFacturaDto);
     // Guardar el nuevo detalle en la base de datos
     return await this.DetalleFacturaRepository.save(nuevoDetalle);
   }
 
-  // Método para obtener todos los detalles de factura
+  /**
+   * Obtiene todos los detalles de factura.
+   * @returns Lista de detalles.
+   */
   async obtenerTodosLosDetalles(): Promise<DetalleFactura[]> {
     return await this.DetalleFacturaRepository.find();
   }
 
-  // Método para obtener un detalle de factura por su id
+  /**
+   * Obtiene un detalle de factura por su ID.
+   * @param id ID del detalle.
+   * @returns El detalle encontrado.
+   * @throws NotFoundException si no se encuentra el detalle.
+   */
   async obtenerDetallePorId(id: number): Promise<DetalleFactura> {
     const detalle = await this.DetalleFacturaRepository.findOneBy({ id_detalle_factura: id });
     if (!detalle) {
@@ -35,7 +53,13 @@ export class DetalleFacturaService {
     return detalle;
   }
 
-  // Método para actualizar un detalle de factura por su id
+  /**
+   * Actualiza un detalle de factura existente.
+   * @param id ID del detalle a actualizar.
+   * @param updateDetalleFacturaDto DTO con datos a actualizar.
+   * @returns El detalle actualizado.
+   * @throws NotFoundException si no se encuentra el detalle.
+   */
   async actualizarDetalle(id: number, updateDetalleFacturaDto: UpdateDetalleFacturaDto): Promise<DetalleFactura> {
     const detalle = await this.DetalleFacturaRepository.preload({
       id_detalle_factura: id,
@@ -49,7 +73,11 @@ export class DetalleFacturaService {
     return await this.DetalleFacturaRepository.save(detalle);
   }
 
-  // Método para eliminar un detalle de factura por su id
+  /**
+   * Elimina un detalle de factura por su ID.
+   * @param id ID del detalle a eliminar.
+   * @throws NotFoundException si no se encuentra el detalle.
+   */
   async eliminarDetalle(id: number): Promise<void> {
     const resultado = await this.DetalleFacturaRepository.delete(id);
     if (resultado.affected === 0) {
@@ -58,17 +86,25 @@ export class DetalleFacturaService {
     }
   }
 
-  // Método para obtener detalles por id_factura
+  /**
+   * Obtiene detalles de factura por ID de factura.
+   * @param id_factura ID de la factura.
+   * @returns Lista de detalles asociados.
+   */
   async obtenerDetallesPorFactura(id_factura: number): Promise<DetalleFactura[]> {
     return await this.DetalleFacturaRepository.find({
-      where: { id_factura },
+      where: { factura: { id_factura } },
     });
   }
 
-  // Método para obtener detalles por id_servicio
+  /**
+   * Obtiene detalles de factura por ID de servicio.
+   * @param id_servicio ID del servicio.
+   * @returns Lista de detalles asociados.
+   */
   async obtenerDetallesPorServicio(id_servicio: number): Promise<DetalleFactura[]> {
     return await this.DetalleFacturaRepository.find({
-      where: { id_servicio },
+      where: { servicio: { id_servicio } },
     });
   }
 }

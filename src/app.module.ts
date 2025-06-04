@@ -1,3 +1,9 @@
+/**
+ * Módulo principal AppModule
+ * Configura la aplicación principal, incluyendo la conexión a la base de datos,
+ * módulos importados, controladores y proveedores.
+ */
+
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';

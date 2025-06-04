@@ -1,3 +1,9 @@
+/**
+ * Servicio HistorialMantenimientoService
+ * Maneja la lógica de negocio para el historial de mantenimiento.
+ * Incluye métodos para crear, obtener, actualizar y eliminar registros.
+ */
+
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateHistorialMantenimientoDto } from './dto/create-historial_mantenimiento.dto';
 import { UpdateHistorialMantenimientoDto } from './dto/update-historial_mantenimiento.dto';
@@ -13,19 +19,31 @@ export class HistorialMantenimientoService {
     private HistorialMantenimientoRepository: Repository<HistorialMantenimiento>,
   ) {}
 
-  // Método para crear un nuevo historial de mantenimiento
+  /**
+   * Crea un nuevo registro de historial de mantenimiento.
+   * @param createHistorialMantenimientoDto DTO con datos del historial.
+   * @returns El registro creado.
+   */
   async crearHistorial(createHistorialMantenimientoDto: CreateHistorialMantenimientoDto): Promise<HistorialMantenimiento> {
     const nuevoHistorial = this.HistorialMantenimientoRepository.create(createHistorialMantenimientoDto);
     // Guardar el nuevo historial en la base de datos
     return await this.HistorialMantenimientoRepository.save(nuevoHistorial);
   }
 
-  // Método para obtener todos los historiales de mantenimiento
+  /**
+   * Obtiene todos los registros de historial de mantenimiento.
+   * @returns Lista de registros.
+   */
   async obtenerTodosLosHistoriales(): Promise<HistorialMantenimiento[]> {
     return await this.HistorialMantenimientoRepository.find();
   }
 
-  // Método para obtener un historial de mantenimiento por su id
+  /**
+   * Obtiene un registro de historial por su ID.
+   * @param id ID del registro.
+   * @returns El registro encontrado.
+   * @throws NotFoundException si no se encuentra el registro.
+   */
   async obtenerHistorialPorId(id: number): Promise<HistorialMantenimiento> {
     const historial = await this.HistorialMantenimientoRepository.findOneBy({ id_mantenimiento: id });
     if (!historial) {
@@ -35,7 +53,13 @@ export class HistorialMantenimientoService {
     return historial;
   }
 
-  // Método para actualizar un historial de mantenimiento por su id
+  /**
+   * Actualiza un registro de historial existente.
+   * @param id ID del registro a actualizar.
+   * @param updateHistorialMantenimientoDto DTO con datos a actualizar.
+   * @returns El registro actualizado.
+   * @throws NotFoundException si no se encuentra el registro.
+   */
   async actualizarHistorial(id: number, updateHistorialMantenimientoDto: UpdateHistorialMantenimientoDto): Promise<HistorialMantenimiento> {
     const historial = await this.HistorialMantenimientoRepository.preload({
       id_mantenimiento: id,
@@ -49,7 +73,11 @@ export class HistorialMantenimientoService {
     return await this.HistorialMantenimientoRepository.save(historial);
   }
 
-  // Método para eliminar un historial de mantenimiento por su id
+  /**
+   * Elimina un registro de historial por su ID.
+   * @param id ID del registro a eliminar.
+   * @throws NotFoundException si no se encuentra el registro.
+   */
   async eliminarHistorial(id: number): Promise<void> {
     const resultado = await this.HistorialMantenimientoRepository.delete(id);
     if (resultado.affected === 0) {
@@ -58,14 +86,23 @@ export class HistorialMantenimientoService {
     }
   }
 
-  // Método para obtener historiales por id_habitacion
+  /**
+   * Obtiene historiales por ID de habitación.
+   * @param id_habitacion ID de la habitación.
+   * @returns Lista de historiales asociados.
+   */
   async obtenerHistorialesPorHabitacion(id_habitacion: number): Promise<HistorialMantenimiento[]> {
     return await this.HistorialMantenimientoRepository.find({
-      where: { id_habitacion },
+      where: { habitacion: { id_habitacion } },
     });
   }
 
-  // Método para obtener historiales por rango de fechas
+  /**
+   * Obtiene historiales por rango de fechas.
+   * @param fechaInicio Fecha de inicio del rango.
+   * @param fechaFin Fecha de fin del rango.
+   * @returns Lista de historiales dentro del rango.
+   */
   async obtenerHistorialesPorRangoFechas(fechaInicio: Date, fechaFin: Date): Promise<HistorialMantenimiento[]> {
     return await this.HistorialMantenimientoRepository.find({
       where: {

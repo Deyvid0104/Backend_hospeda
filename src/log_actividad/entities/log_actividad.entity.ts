@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Usuario } from 'src/usuario/entities/usuario.entity';
 
 @Entity()
@@ -6,10 +6,6 @@ export class LogActividad {
     // Identificador único del log de actividad
     @PrimaryGeneratedColumn()
     id_log: number;
-
-    // Identificador del usuario asociado
-    @Column()
-    id_usuario: number;
 
     // Acción realizada
     @Column()
@@ -29,5 +25,6 @@ export class LogActividad {
 
     // Relación ManyToOne con la entidad Usuario
     @ManyToOne(() => Usuario, usuario => usuario.logs)
+    @JoinColumn({ name: 'id_usuario' })
     usuario: Usuario;
 }

@@ -9,8 +9,11 @@ import { UpdateDetalleReservaDto } from './dto/update-detalle_reserva.dto';
 export class DetalleReservaController {
   constructor(private readonly detalleReservaService: DetalleReservaService) {}
 
-  // Crear un nuevo detalle de reserva
-  // POST /detalle-reserva
+  /**
+   * Crea un nuevo detalle de reserva.
+   * @param createDetalleReservaDto DTO con datos del detalle.
+   * @returns El detalle creado.
+   */
   @Post()
   crearDetalle(@Body() createDetalleReservaDto: CreateDetalleReservaDto) {
     return this.detalleReservaService.crearDetalle(createDetalleReservaDto);
@@ -26,8 +29,10 @@ export class DetalleReservaController {
   }
   */
 
-  // Obtener todos los detalles de reserva
-  // GET /detalle-reserva
+  /**
+   * Obtiene todos los detalles de reserva.
+   * @returns Lista de detalles.
+   */
   @Get()
   obtenerTodosLosDetalles() {
     return this.detalleReservaService.obtenerTodosLosDetalles();
@@ -37,8 +42,11 @@ export class DetalleReservaController {
   GET http://localhost:4000/detalle-reserva
   */
 
-  // Obtener un detalle de reserva por ID
-  // GET /detalle-reserva/:id
+  /**
+   * Obtiene un detalle de reserva por su ID.
+   * @param id ID del detalle.
+   * @returns El detalle encontrado.
+   */
   @Get(':id')
   obtenerDetallePorId(@Param('id') id: string) {
     return this.detalleReservaService.obtenerDetallePorId(+id);
@@ -48,8 +56,12 @@ export class DetalleReservaController {
   GET http://localhost:4000/detalle-reserva/1
   */
 
-  // Actualizar un detalle de reserva por ID
-  // PUT /detalle-reserva/:id
+  /**
+   * Actualiza un detalle de reserva por su ID.
+   * @param id ID del detalle.
+   * @param updateDetalleReservaDto DTO con datos a actualizar.
+   * @returns El detalle actualizado.
+   */
   @Put(':id')
   actualizarDetalle(@Param('id') id: string, @Body() updateDetalleReservaDto: UpdateDetalleReservaDto) {
     return this.detalleReservaService.actualizarDetalle(+id, updateDetalleReservaDto);
@@ -63,8 +75,11 @@ export class DetalleReservaController {
   }
   */
 
-  // Eliminar un detalle de reserva por ID
-  // DELETE /detalle-reserva/:id
+  /**
+   * Elimina un detalle de reserva por su ID.
+   * @param id ID del detalle.
+   * @returns Resultado de la eliminación.
+   */
   @Delete(':id')
   eliminarDetalle(@Param('id') id: string) {
     return this.detalleReservaService.eliminarDetalle(+id);
@@ -74,23 +89,23 @@ export class DetalleReservaController {
   DELETE http://localhost:4000/detalle-reserva/1
   */
 
-  // Obtener detalles por id_reserva
-  // GET /detalle-reserva/reserva?id_reserva=1
+  /**
+   * Obtiene detalles de reserva por ID de reserva.
+   * @param query Parámetros de consulta con id_reserva.
+   * @returns Lista de detalles asociados a la reserva.
+   * @throws BadRequestException si el parámetro es inválido o ausente.
+   */
   @Get('reserva')
   async obtenerDetallesPorReserva(@Query() query: any) {
-    console.log('Parámetros de consulta recibidos en backend:', query);
     const id_reserva = query.id_reserva;
     if (!id_reserva) {
-      console.error('No se recibió el parámetro id_reserva en la consulta');
       throw new BadRequestException('Parámetro id_reserva es requerido');
     }
     const idReservaNum = Number(id_reserva);
     if (isNaN(idReservaNum) || idReservaNum <= 0) {
-      console.error(`ID de reserva inválido recibido: ${id_reserva}`);
       throw new BadRequestException('ID de reserva inválido');
     }
     try {
-      console.log(`Buscando detalles para reserva ${idReservaNum}`);
       const detalles = await this.detalleReservaService.obtenerDetallesPorReserva(idReservaNum);
       
       // Log para detectar detalles con habitacion null
@@ -100,10 +115,8 @@ export class DetalleReservaController {
         }
       });
       
-      console.log('Detalles encontrados:', JSON.stringify(detalles, null, 2));
       return detalles;
     } catch (error) {
-      console.error('Error al obtener detalles de reserva:', error);
       throw error;
     }
   }
@@ -112,8 +125,11 @@ export class DetalleReservaController {
   GET http://localhost:4000/detalle-reserva/reserva?id_reserva=1
   */
 
-  // Obtener detalles por id_habitacion
-  // GET /detalle-reserva/habitacion?id_habitacion=101
+  /**
+   * Obtiene detalles de reserva por ID de habitación.
+   * @param id_habitacion ID de la habitación.
+   * @returns Lista de detalles asociados a la habitación.
+   */
   @Get('habitacion')
   obtenerDetallesPorHabitacion(@Query('id_habitacion') id_habitacion: string) {
     return this.detalleReservaService.obtenerDetallesPorHabitacion(+id_habitacion);

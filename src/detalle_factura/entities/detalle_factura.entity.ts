@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Factura } from 'src/factura/entities/factura.entity';
 import { ServicioAdicional } from 'src/servicio_adicional/entities/servicio_adicional.entity';
 
@@ -7,14 +7,6 @@ export class DetalleFactura {
  // Identificador único del detalle de factura
  @PrimaryGeneratedColumn()
  id_detalle_factura: number;
-
- // Identificador de la factura asociada
- @Column()
- id_factura: number;
-
- // Identificador del servicio adicional
- @Column()
- id_servicio: number;
 
  // Concepto o descripción del detalle
  @Column()
@@ -30,9 +22,11 @@ export class DetalleFactura {
 
  // Relación ManyToOne con la entidad Factura
  @ManyToOne(() => Factura, factura => factura.detalles_factura)
+ @JoinColumn({ name: 'id_factura' })
  factura: Factura;
 
  // Relación ManyToOne con la entidad ServicioAdicional
  @ManyToOne(() => ServicioAdicional, servicio => servicio.detalles_factura)
+ @JoinColumn({ name: 'id_servicio' })
  servicio: ServicioAdicional;
 }
