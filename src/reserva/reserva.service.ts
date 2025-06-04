@@ -40,6 +40,26 @@ export class ReservaService {
         throw new NotFoundException(`Huésped con id ${createReservaDto.huespedId} no encontrado`);
       }
 
+      // Validar disponibilidad de habitaciones
+      if (createReservaDto.detalles_reserva && createReservaDto.detalles_reserva.length > 0) {
+        for (const detalleDto of createReservaDto.detalles_reserva) {
+          const habitacionesOcupadas = await transactionalEntityManager
+            .createQueryBuilder(Habitacion, 'habitacion')
+            .innerJoin('habitacion.detalles_reserva', 'detalle')
+            .innerJoin('detalle.reserva', 'reserva')
+            .where('habitacion.id_habitacion = :idHabitacion', { idHabitacion: detalleDto.id_habitacion })
+            .andWhere('reserva.fecha_entrada <= :fechaFin AND reserva.fecha_salida >= :fechaInicio', {
+              fechaInicio: createReservaDto.fecha_entrada,
+              fechaFin: createReservaDto.fecha_salida,
+            })
+            .getCount();
+
+          if (habitacionesOcupadas > 0) {
+            throw new NotFoundException(`Habitación con id ${detalleDto.id_habitacion} no disponible en el rango de fechas`);
+          }
+        }
+      }
+
       // Crear la entidad reserva con los datos proporcionados
 
       const nuevaReserva = this.ReservaRepository.create({
@@ -159,6 +179,30 @@ export class ReservaService {
           huesped = await huespedRepository.findOneBy({ id_huesped: idHuesped });
           if (!huesped) {
             throw new NotFoundException(`Huésped con id ${idHuesped} no encontrado`);
+          }
+        }
+      }
+
+      // Validar disponibilidad de habitaciones si se actualizan detalles_reserva o fechas
+      if (updateReservaDto.detalles_reserva && updateReservaDto.detalles_reserva.length > 0) {
+        const fechaInicio = updateReservaDto.fecha_entrada || (await this.obtenerReservaPorId(id)).fecha_entrada;
+        const fechaFin = updateReservaDto.fecha_salida || (await this.obtenerReservaPorId(id)).fecha_salida;
+
+        for (const detalleDto of updateReservaDto.detalles_reserva) {
+          const habitacionesOcupadas = await this.ReservaRepository.manager
+            .createQueryBuilder(Habitacion, 'habitacion')
+            .innerJoin('habitacion.detalles_reserva', 'detalle')
+            .innerJoin('detalle.reserva', 'reserva')
+            .where('habitacion.id_habitacion = :idHabitacion', { idHabitacion: detalleDto.id_habitacion })
+            .andWhere('reserva.fecha_entrada <= :fechaFin AND reserva.fecha_salida >= :fechaInicio', {
+              fechaInicio,
+              fechaFin,
+            })
+            .andWhere('reserva.id_reserva != :idReserva', { idReserva: id })
+            .getCount();
+
+          if (habitacionesOcupadas > 0) {
+            throw new NotFoundException(`Habitación con id ${detalleDto.id_habitacion} no disponible en el rango de fechas`);
           }
         }
       }

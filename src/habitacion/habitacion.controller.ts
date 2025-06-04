@@ -20,6 +20,15 @@ export class HabitacionController {
   crearHabitacion(@Body() createHabitacionDto: CreateHabitacionDto) {
     return this.habitacionService.crearHabitacion(createHabitacionDto);
   }
+
+  // Obtener habitaciones disponibles en un rango de fechas
+  // GET /habitacion/disponibilidad?fechaInicio=YYYY-MM-DD&fechaFin=YYYY-MM-DD
+  @Get('disponibilidad')
+  obtenerHabitacionesDisponibles(@Query('fechaInicio') fechaInicio: string, @Query('fechaFin') fechaFin: string) {
+    const fechaInicioDate = new Date(fechaInicio);
+    const fechaFinDate = new Date(fechaFin);
+    return this.habitacionService.obtenerHabitacionesDisponibles(fechaInicioDate, fechaFinDate);
+  }
   /*
   Ejemplo:
   POST http://localhost:4000/habitacion

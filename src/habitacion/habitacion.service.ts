@@ -19,6 +19,29 @@ export class HabitacionService {
     return await this.HabitacionRepository.save(nuevaHabitacion);
   }
 
+  // Obtener habitaciones disponibles en un rango de fechas
+  async obtenerHabitacionesDisponibles(fechaInicio: Date, fechaFin: Date): Promise<Habitacion[]> {
+    // Query para obtener habitaciones que no estén reservadas en el rango dado
+    const habitacionesOcupadas = await this.HabitacionRepository
+      .createQueryBuilder('habitacion')
+      .innerJoin('habitacion.detalles_reserva', 'detalle')
+      .innerJoin('detalle.reserva', 'reserva')
+      .where('reserva.fecha_entrada <= :fechaFin AND reserva.fecha_salida >= :fechaInicio', { fechaInicio, fechaFin })
+      .select('habitacion.id_habitacion')
+      .getRawMany();
+
+    const idsOcupados = habitacionesOcupadas.map(h => h.habitacion_id_habitacion);
+
+    if (idsOcupados.length === 0) {
+      return this.HabitacionRepository.find();
+    }
+
+    return this.HabitacionRepository
+      .createQueryBuilder('habitacion')
+      .where('habitacion.id_habitacion NOT IN (:...ids)', { ids: idsOcupados })
+      .getMany();
+  }
+
   // Obtener todas las habitaciones registradas
   async obtenerTodasLasHabitaciones(): Promise<Habitacion[]> {
     return await this.HabitacionRepository.find();
