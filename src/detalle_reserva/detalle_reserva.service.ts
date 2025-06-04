@@ -59,8 +59,8 @@ export class DetalleReservaService {
       const nuevoDetalle = this.DetalleReservaRepository.create({
         noches: createDetalleReservaDto.noches,
         precio_aplicado: createDetalleReservaDto.precio_aplicado,
-        reserva: { id_reserva: reserva.id_reserva },
-        habitacion: { id_habitacion: habitacion.id_habitacion },
+        reserva: reserva,
+        habitacion: habitacion,
       });
 
       // Guardar el detalle en la base de datos

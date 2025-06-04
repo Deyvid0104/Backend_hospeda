@@ -41,6 +41,7 @@ export class ReservaService {
       }
 
       // Crear la entidad reserva con los datos proporcionados
+
       const nuevaReserva = this.ReservaRepository.create({
         fecha_entrada: createReservaDto.fecha_entrada,
         fecha_salida: createReservaDto.fecha_salida,
@@ -148,9 +149,24 @@ export class ReservaService {
    * @throws NotFoundException si no se encuentra la reserva.
    */
   async actualizarReserva(id: number, updateReservaDto: UpdateReservaDto): Promise<Reserva> {
+    // Si se recibe id_huesped, buscar el objeto huesped y asignar
+    let huesped: any | null = null;
+    if ('id_huesped' in updateReservaDto) {
+      const idHuesped = (updateReservaDto as any).id_huesped;
+      if (idHuesped) {
+        const huespedRepository = this.ReservaRepository.manager.getRepository('Huesped');
+        huesped = await huespedRepository.findOneBy({ id_huesped: idHuesped });
+        if (!huesped) {
+          throw new NotFoundException(`Huesped con id ${idHuesped} no encontrado`);
+        }
+      }
+    }
+
+    // Preload para actualizar la reserva
     const reserva = await this.ReservaRepository.preload({
       id_reserva: id,
       ...updateReservaDto,
+      huesped: huesped ?? undefined,
     });
     if (!reserva) {
       throw new NotFoundException(`Reserva con id ${id} no encontrada para actualizar`);

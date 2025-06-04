@@ -10,6 +10,7 @@ import { UpdateContactoEmergenciaDto } from './dto/update-contacto_emergencia.dt
 import { InjectRepository } from '@nestjs/typeorm';
 import { ContactoEmergencia } from './entities/contacto_emergencia.entity';
 import { Repository, Like } from 'typeorm';
+import { Huesped } from '../huesped/entities/huesped.entity';
 
 @Injectable()
 export class ContactoEmergenciaService {
@@ -17,6 +18,8 @@ export class ContactoEmergenciaService {
     // Inyección del repositorio para acceso a la base de datos MySQL con TypeORM
     @InjectRepository(ContactoEmergencia, 'austral')
     private ContactoEmergenciaRepository: Repository<ContactoEmergencia>,
+    @InjectRepository(Huesped, 'austral')
+    private HuespedRepository: Repository<Huesped>,
   ) {}
 
   /**
@@ -25,7 +28,19 @@ export class ContactoEmergenciaService {
    * @returns El contacto creado.
    */
   async crearContacto(createContactoEmergenciaDto: CreateContactoEmergenciaDto): Promise<ContactoEmergencia> {
-    const nuevoContacto = this.ContactoEmergenciaRepository.create(createContactoEmergenciaDto);
+    // Buscar el huésped por id_huesped
+    const huesped = await this.HuespedRepository.findOneBy({ id_huesped: createContactoEmergenciaDto.id_huesped });
+    if (!huesped) {
+      throw new NotFoundException(`Huesped con id ${createContactoEmergenciaDto.id_huesped} no encontrado`);
+    }
+
+    // Crear el contacto con la relación huesped
+    const nuevoContacto = this.ContactoEmergenciaRepository.create({
+      nombre: createContactoEmergenciaDto.nombre,
+      telefono: createContactoEmergenciaDto.telefono,
+      parentesco: createContactoEmergenciaDto.parentesco,
+      huesped: huesped,
+    });
     return await this.ContactoEmergenciaRepository.save(nuevoContacto);
   }
 
@@ -60,9 +75,21 @@ export class ContactoEmergenciaService {
    * @throws NotFoundException si no se encuentra el contacto.
    */
   async actualizarContacto(id: number, updateContactoEmergenciaDto: UpdateContactoEmergenciaDto): Promise<ContactoEmergencia> {
+    // Buscar el huésped si se recibe id_huesped
+    let huesped: Huesped | null = null;
+    if (updateContactoEmergenciaDto.id_huesped) {
+      huesped = await this.HuespedRepository.findOneBy({ id_huesped: updateContactoEmergenciaDto.id_huesped });
+      if (!huesped) {
+        throw new NotFoundException(`Huesped con id ${updateContactoEmergenciaDto.id_huesped} no encontrado`);
+      }    }
+
+    // Preload para actualizar el contacto
     const contacto = await this.ContactoEmergenciaRepository.preload({
       id_contacto: id,
-      ...updateContactoEmergenciaDto,
+      nombre: updateContactoEmergenciaDto.nombre,
+      telefono: updateContactoEmergenciaDto.telefono,
+      parentesco: updateContactoEmergenciaDto.parentesco,
+      huesped: huesped ?? undefined,
     });
     if (!contacto) {
       // Lanzar excepción si no se encuentra el contacto para actualizar
@@ -102,7 +129,8 @@ export class ContactoEmergenciaService {
    */
   async obtenerContactosPorHuesped(id_huesped: number): Promise<ContactoEmergencia[]> {
     return await this.ContactoEmergenciaRepository.find({
-      where: { huesped: { id_huesped } },
+      where: { huesped: { id_huesped: id_huesped } },
+      relations: ['huesped'],
     });
   }
 }
