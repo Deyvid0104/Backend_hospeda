@@ -216,8 +216,9 @@ export class DetalleReservaService {
         .innerJoinAndSelect('detalle.habitacion', 'habitacion')
         .innerJoinAndSelect('detalle.reserva', 'reserva')
         .innerJoinAndSelect('reserva.huesped', 'huesped')
-        .leftJoinAndSelect('detalle.factura', 'factura')
-        .leftJoinAndSelect('factura.detalles_factura', 'detalles_factura')
+        // Comentado porque la relación factura no existe en detalle_reserva.entity.ts
+        // .leftJoinAndSelect('detalle.factura', 'factura')
+        // .leftJoinAndSelect('factura.detalles_factura', 'detalles_factura')
         .where('reserva.id_reserva = :id_reserva', { id_reserva })
         .getMany();
       

@@ -149,29 +149,91 @@ export class ReservaService {
    * @throws NotFoundException si no se encuentra la reserva.
    */
   async actualizarReserva(id: number, updateReservaDto: UpdateReservaDto): Promise<Reserva> {
-    // Si se recibe id_huesped, buscar el objeto huesped y asignar
-    let huesped: any | null = null;
-    if ('id_huesped' in updateReservaDto) {
-      const idHuesped = (updateReservaDto as any).id_huesped;
-      if (idHuesped) {
-        const huespedRepository = this.ReservaRepository.manager.getRepository('Huesped');
-        huesped = await huespedRepository.findOneBy({ id_huesped: idHuesped });
-        if (!huesped) {
-          throw new NotFoundException(`Huesped con id ${idHuesped} no encontrado`);
+    try {
+      // Si se recibe id_huesped, buscar el objeto huesped y asignar
+      let huesped: any | null = null;
+      if ('id_huesped' in updateReservaDto) {
+        const idHuesped = (updateReservaDto as any).id_huesped;
+        if (idHuesped) {
+          const huespedRepository = this.ReservaRepository.manager.getRepository('Huesped');
+          huesped = await huespedRepository.findOneBy({ id_huesped: idHuesped });
+          if (!huesped) {
+            throw new NotFoundException(`Huésped con id ${idHuesped} no encontrado`);
+          }
         }
       }
-    }
 
-    // Preload para actualizar la reserva
-    const reserva = await this.ReservaRepository.preload({
-      id_reserva: id,
-      ...updateReservaDto,
-      huesped: huesped ?? undefined,
-    });
-    if (!reserva) {
-      throw new NotFoundException(`Reserva con id ${id} no encontrada para actualizar`);
+      // Preload para actualizar la reserva
+      const reserva = await this.ReservaRepository.preload({
+        id_reserva: id,
+        ...updateReservaDto,
+        huesped: huesped ?? undefined,
+      });
+      if (!reserva) {
+        throw new NotFoundException(`Reserva con id ${id} no encontrada para actualizar`);
+      }
+
+      // Guardar la reserva actualizada
+      const reservaActualizada = await this.ReservaRepository.save(reserva);
+
+      // Actualizar detalles de reserva si vienen en el DTO
+      if (updateReservaDto.detalles_reserva && updateReservaDto.detalles_reserva.length > 0) {
+        // Obtener detalles actuales de la reserva
+        const detallesActuales = await this.detalleReservaService.obtenerDetallesPorReserva(id);
+
+        // Mapear detalles actuales por id para fácil acceso
+        const detallesActualesMap = new Map<number, any>();
+        detallesActuales.forEach(det => {
+          detallesActualesMap.set(det.id_detalle, det);
+        });
+
+        // Procesar cada detalle enviado en la actualización
+        for (const detalleDto of updateReservaDto.detalles_reserva) {
+          // Buscar si el detalle ya existe (por id_detalle)
+          // Si no tiene id_detalle, se asume nuevo detalle
+          if ((detalleDto as any).id_detalle) {
+            const idDetalle = (detalleDto as any).id_detalle;
+            if (detallesActualesMap.has(idDetalle)) {
+              // Actualizar detalle existente
+              await this.detalleReservaService.actualizarDetalle(idDetalle, detalleDto);
+              detallesActualesMap.delete(idDetalle);
+            } else {
+              // No existe, crear nuevo detalle
+              await this.detalleReservaService.crearDetalle({
+                ...detalleDto,
+                id_reserva: reservaActualizada.id_reserva,
+              });
+            }
+          } else {
+            // Nuevo detalle, crear
+            await this.detalleReservaService.crearDetalle({
+              ...detalleDto,
+              id_reserva: reservaActualizada.id_reserva,
+            });
+          }
+        }
+
+        // Eliminar detalles que no están en la actualización (los que quedaron en detallesActualesMap)
+        for (const detalleRestante of detallesActualesMap.values()) {
+          await this.detalleReservaService.eliminarDetalle(detalleRestante.id_detalle);
+        }
+      }
+
+      // Devolver la reserva actualizada con detalles
+      const reservaConDetalles = await this.ReservaRepository.findOne({
+        where: { id_reserva: id },
+        relations: ['detalles_reserva', 'detalles_reserva.habitacion', 'huesped'],
+      });
+
+      if (!reservaConDetalles) {
+        throw new NotFoundException(`Reserva con id ${id} no encontrada después de actualizar`);
+      }
+
+      return reservaConDetalles;
+    } catch (error) {
+      console.error('Error al actualizar reserva:', error);
+      throw error;
     }
-    return await this.ReservaRepository.save(reserva);
   }
 
   /**
