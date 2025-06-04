@@ -106,10 +106,10 @@ export class ReservaService {
       .leftJoinAndSelect('reserva.huesped', 'huesped');
 
     if (fechaEntrada) {
-      query.andWhere('reserva.fecha_entrada >= :fechaEntrada', { fechaEntrada });
+      query.andWhere('reserva.fecha_entrada = :fechaEntrada', { fechaEntrada });
     }
     if (fechaSalida) {
-      query.andWhere('reserva.fecha_salida <= :fechaSalida', { fechaSalida });
+      query.andWhere('reserva.fecha_salida = :fechaSalida', { fechaSalida });
     }
     if (nombreHuesped) {
       query.andWhere(
