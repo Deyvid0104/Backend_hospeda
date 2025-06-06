@@ -19,9 +19,21 @@ export class HuespedService {
     return await this.HuespedRepository.save(nuevoHuesped);
   }
 
-  // Obtener todos los huéspedes registrados
-  async obtenerTodosLosHuespedes(): Promise<Huesped[]> {
-    return await this.HuespedRepository.find();
+  // Obtener todos los huéspedes registrados con filtros opcionales
+  async obtenerTodosLosHuespedes(nombre?: string, email?: string, telefono?: string): Promise<Huesped[]> {
+    const query = this.HuespedRepository.createQueryBuilder('huesped');
+
+    if (nombre) {
+      query.andWhere('(huesped.nombre LIKE :nombre OR huesped.apellidos LIKE :nombre)', { nombre: `%${nombre}%` });
+    }
+    if (email) {
+      query.andWhere('huesped.email LIKE :email', { email: `%${email}%` });
+    }
+    if (telefono) {
+      query.andWhere('huesped.telefono LIKE :telefono', { telefono: `%${telefono}%` });
+    }
+
+    return await query.getMany();
   }
 
   // Obtener un huésped por su identificador único

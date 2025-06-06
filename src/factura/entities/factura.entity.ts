@@ -13,6 +13,10 @@ export class Factura {
  @Column({ type: 'decimal', precision: 10, scale: 2 })
  monto_total: number;
 
+ // Descuento aplicado a la factura, valor decimal, por defecto 0
+ @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
+ descuento: number;
+
  // Método de pago: efectivo, tarjeta o transferencia
  @Column({
      type: 'enum',

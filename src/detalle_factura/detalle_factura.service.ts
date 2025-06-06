@@ -142,6 +142,7 @@ export class DetalleFacturaService {
   async obtenerDetallesPorFactura(id_factura: number): Promise<DetalleFactura[]> {
     return await this.DetalleFacturaRepository.find({
       where: { factura: { id_factura } },
+      relations: ['factura', 'servicio'],
     });
   }
 

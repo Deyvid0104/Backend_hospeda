@@ -1,192 +1,314 @@
 # Hospeda+ Backend
 
-Sistema backend para la gestión de huéspedes en establecimientos hoteleros, desarrollado con NestJS y TypeScript, con arquitectura modular y escalable.
+API RESTful robusta y escalable para el sistema de gestión hotelera Hospeda+, desarrollada con NestJS y TypeScript. Proporciona una arquitectura modular con autenticación JWT, gestión de base de datos MySQL mediante TypeORM y un completo conjunto de endpoints para la administración hotelera.
 
----
+## 🚀 Características Principales
 
-## Requisitos
+### 1. Sistema de Autenticación y Autorización
+- Autenticación JWT con Passport
+- Control de acceso basado en roles
+- Encriptación de contraseñas con bcrypt
+- Validación de tokens
+- Protección de rutas por roles
+- Manejo de sesiones seguro
 
-- Node.js v16 o superior
-- npm v8 o superior
-- MySQL (configurado y en ejecución)
+### 2. Gestión de Reservas
+- CRUD completo de reservas
+- Validación de disponibilidad en tiempo real
+- Manejo transaccional para integridad de datos
+- Estados de reserva (confirmada, cancelada)
+- Asignación automática de habitaciones
+- Validaciones de negocio:
+  - Disponibilidad de habitaciones
+  - Fechas válidas
+  - Capacidad de habitaciones
+  - Existencia de huésped
 
----
+### 3. Sistema de Facturación
+- Generación automática de facturas
+- Múltiples métodos de pago:
+  - Efectivo
+  - Tarjeta
+  - Transferencia
+- Estados de factura:
+  - Pendiente
+  - Pagada
+  - Anulada
+- Cálculo automático de:
+  - Montos totales
+  - Descuentos
+  - Impuestos
+- Detalles itemizados de servicios
 
-## Instalación
+### 4. Gestión de Huéspedes
+- Registro completo de información
+- Validación de datos únicos:
+  - Email
+  - Documento de identidad
+- Historial de reservas
+- Contactos de emergencia
+- Búsqueda y filtrado avanzado
 
-1. Clona el repositorio:
+### 5. Sistema de Habitaciones
+- Gestión de estados:
+  - Libre
+  - Ocupada
+  - Limpieza
+  - Mantenimiento
+- Tipos de habitación:
+  - Individual
+  - Doble
+  - Triple
+  - Dormitorio
+- Control de:
+  - Precios base
+  - Capacidad
+  - Mantenimiento
+  - Disponibilidad
 
+## 🛠️ Tecnologías Utilizadas
+
+### Core
+- **NestJS**: ^11.0.1
+- **TypeScript**: ^5.7.3
+- **MySQL**: ^2.18.1
+- **TypeORM**: ^0.3.22
+
+### Autenticación y Seguridad
+- **@nestjs/jwt**: ^11.0.0
+- **@nestjs/passport**: ^11.0.5
+- **bcrypt**: ^5.1.1
+- **passport-jwt**: ^4.0.1
+
+### Validación y Transformación
+- **class-validator**: ^0.14.1
+- **class-transformer**: ^0.5.1
+
+### Testing
+- **Jest**: ^29.7.0
+- **Supertest**: ^7.0.0
+
+## 📦 Instalación y Configuración
+
+### Requisitos del Sistema
+- Node.js 18.17 o superior
+- npm 9.x o superior
+- MySQL 8.0+
+- Git
+
+### Pasos de Instalación
+
+1. **Clonar el Repositorio**
 ```bash
-git clone https://github.com/Deyvid0104/Backend_hospeda.git
-cd hospeda
+git clone [URL_DEL_REPOSITORIO]
+cd hospeda-backend
 ```
 
-2. Instala las dependencias:
-
+2. **Instalar Dependencias**
 ```bash
 npm install
 ```
 
----
-
-## Configuración
-
-Copia el archivo de ejemplo de variables de entorno y configura los valores necesarios:
-
+3. **Configurar Variables de Entorno**
 ```bash
-copy .env.ejemplo .env
+# Crear archivo .env
+URL=localhost
+USUARIO=tu_usuario
+PASSWORD=tu_contraseña
+DBNAME=hospeda_db
+JWT_SECRET=tu_secret_key
 ```
 
-Configura las variables para la conexión a la base de datos MySQL:
+## 🚦 Comandos Disponibles
 
+### Desarrollo
+```bash
+# Desarrollo con hot-reload
+npm run start:dev
+
+# Modo debug
+npm run start:debug
+
+# Producción
+npm run start:prod
 ```
-DB_HOST=localhost
-DB_PORT=3306
-DB_USERNAME=tu_usuario
-DB_PASSWORD=tu_contraseña
-DB_DATABASE=nombre_base_de_datos
+
+### Testing
+```bash
+# Tests unitarios
+npm run test
+
+# Tests e2e
+npm run test:e2e
+
+# Cobertura
+npm run test:cov
 ```
 
----
+### Calidad de Código
+```bash
+# Linting
+npm run lint
 
-## Comandos disponibles
+# Formateo
+npm run format
+```
 
-- `npm run start` - Ejecuta la aplicación en modo producción
-- `npm run start:dev` - Ejecuta la aplicación en modo desarrollo con recarga automática
-- `npm run start:debug` - Ejecuta la aplicación en modo debug
-- `npm run build` - Compila el proyecto
-- `npm run lint` - Ejecuta ESLint para análisis y corrección de código
-- `npm run format` - Formatea el código con Prettier
-- `npm run test` - Ejecuta pruebas unitarias
-- `npm run test:e2e` - Ejecuta pruebas end-to-end
-- `npm run test:cov` - Genera reporte de cobertura de pruebas
+## 📡 API Endpoints
 
----
-
-## Tecnologías usadas
-
-- NestJS
-- TypeScript
-- TypeORM
-- MySQL
-- Passport (JWT y local)
-- RxJS
-- ESLint
-- Prettier
-- Jest
-
----
-
-## Endpoints disponibles
-
-### Huéspedes
-
-- `POST /huesped` - Crear un huésped
-- `GET /huesped` - Obtener todos los huéspedes
-- `GET /huesped/:id` - Obtener un huésped por ID
-- `PUT /huesped/:id` - Actualizar un huésped por ID
-- `DELETE /huesped/:id` - Eliminar un huésped por ID
-
-### Habitaciones
-
-- `POST /habitacion` - Crear una nueva habitación
-- `GET /habitacion` - Obtener todas las habitaciones
-- `GET /habitacion/:id` - Obtener una habitación por ID
-- `PUT /habitacion/:id` - Actualizar una habitación por ID
-- `DELETE /habitacion/:id` - Eliminar una habitación por ID
-- `GET /habitacion/tipo?tipo=...` - Obtener habitaciones por tipo
-- `GET /habitacion/estado?estado=...` - Obtener habitaciones por estado
-- `GET /habitacion/rango-precio?precioMin=...&precioMax=...` - Obtener habitaciones por rango de precio
-- `GET /habitacion/buscar-numero?numero=...` - Buscar habitaciones por número exacto
+### Autenticación
+```http
+POST /auth/login
+# Body: { "email": "user@example.com", "contraseña": "password" }
+```
 
 ### Reservas
+```http
+GET /reserva
+GET /reserva/:id
+POST /reserva
+PUT /reserva/:id
+DELETE /reserva/:id
+```
 
-- `POST /reserva` - Crear una nueva reserva
-- `GET /reserva` - Obtener todas las reservas
-- `GET /reserva/:id` - Obtener una reserva por ID
-- `PUT /reserva/:id` - Actualizar una reserva por ID
-- `DELETE /reserva/:id` - Eliminar una reserva por ID
+### Habitaciones
+```http
+GET /habitacion
+GET /habitacion/:id
+POST /habitacion
+PUT /habitacion/:id
+DELETE /habitacion/:id
+GET /habitacion/tipo?tipo=doble
+GET /habitacion/estado?estado=libre
+```
 
-### Servicios Adicionales
-
-- `POST /servicio-adicional` - Crear un nuevo servicio adicional
-- `GET /servicio-adicional` - Obtener todos los servicios adicionales
-- `GET /servicio-adicional/:id` - Obtener un servicio adicional por ID
-- `PUT /servicio-adicional/:id` - Actualizar un servicio adicional por ID
-- `DELETE /servicio-adicional/:id` - Eliminar un servicio adicional por ID
-
-### Contactos de Emergencia
-
-- `POST /contacto-emergencia` - Crear un nuevo contacto de emergencia
-- `GET /contacto-emergencia` - Obtener todos los contactos de emergencia
-- `GET /contacto-emergencia/:id` - Obtener un contacto de emergencia por ID
-- `PUT /contacto-emergencia/:id` - Actualizar un contacto de emergencia por ID
-- `DELETE /contacto-emergencia/:id` - Eliminar un contacto de emergencia por ID
-- `GET /contacto-emergencia/buscar?nombre=...` - Buscar contactos por nombre parcial
-- `GET /contacto-emergencia/huesped?id_huesped=...` - Obtener contactos por huésped
+### Huéspedes
+```http
+GET /huesped
+GET /huesped/:id
+POST /huesped
+PUT /huesped/:id
+DELETE /huesped/:id
+```
 
 ### Facturas
+```http
+GET /factura
+GET /factura/:id
+POST /factura
+PUT /factura/:id
+DELETE /factura/:id
+```
 
-- `POST /factura` - Crear una nueva factura
-- `GET /factura` - Obtener todas las facturas
-- `GET /factura/:id` - Obtener una factura por ID
-- `PUT /factura/:id` - Actualizar una factura por ID
-- `DELETE /factura/:id` - Eliminar una factura por ID
-- `GET /factura/rango-monto?montoMin=...&montoMax=...` - Obtener facturas por rango de monto
-- `GET /factura/metodo-pago?metodo=...` - Obtener facturas por método de pago
+## 📁 Estructura del Proyecto
 
-### Detalles de Factura
+```
+src/
+├── app/                    # Configuración principal
+│   ├── app.module.ts      # Módulo raíz
+│   └── main.ts           # Punto de entrada
+├── auth/                  # Autenticación
+│   ├── auth.module.ts
+│   ├── auth.service.ts
+│   └── jwt.strategy.ts
+├── reserva/              # Módulo de reservas
+├── habitacion/           # Módulo de habitaciones
+├── huesped/              # Módulo de huéspedes
+├── factura/              # Módulo de facturación
+└── shared/               # Recursos compartidos
+```
 
-- `POST /detalle-factura` - Crear un nuevo detalle de factura
-- `GET /detalle-factura` - Obtener todos los detalles de factura
-- `GET /detalle-factura/:id` - Obtener un detalle de factura por ID
-- `PUT /detalle-factura/:id` - Actualizar un detalle de factura por ID
-- `DELETE /detalle-factura/:id` - Eliminar un detalle de factura por ID
-- `GET /detalle-factura/factura?id_factura=...` - Obtener detalles por factura
-- `GET /detalle-factura/servicio?id_servicio=...` - Obtener detalles por servicio
+## 🔒 Seguridad
 
-### Detalles de Reserva
+### Autenticación
+- JWT con expiración configurable
+- Refresh tokens
+- Blacklisting de tokens
 
-- `POST /detalle-reserva` - Crear un nuevo detalle de reserva
-- `GET /detalle-reserva` - Obtener todos los detalles de reserva
-- `GET /detalle-reserva/:id` - Obtener un detalle de reserva por ID
-- `PUT /detalle-reserva/:id` - Actualizar un detalle de reserva por ID
-- `DELETE /detalle-reserva/:id` - Eliminar un detalle de reserva por ID
-- `GET /detalle-reserva/reserva?id_reserva=...` - Obtener detalles por reserva
-- `GET /detalle-reserva/habitacion?id_habitacion=...` - Obtener detalles por habitación
+### Autorización
+- Roles: admin, recepcionista
+- Guards personalizados
+- Decoradores de roles
 
-### Historial de Mantenimiento
+### Protección
+- Rate limiting
+- CORS configurado
+- Helmet para headers HTTP
+- Validación de datos
 
-- `POST /historial-mantenimiento` - Crear un nuevo historial de mantenimiento
-- `GET /historial-mantenimiento` - Obtener todos los historiales de mantenimiento
-- `GET /historial-mantenimiento/:id` - Obtener un historial de mantenimiento por ID
-- `PUT /historial-mantenimiento/:id` - Actualizar un historial de mantenimiento por ID
-- `DELETE /historial-mantenimiento/:id` - Eliminar un historial de mantenimiento por ID
+## 🔄 Base de Datos
 
-### Logs de Actividad
+### Configuración TypeORM
+```typescript
+TypeOrmModule.forRoot({
+  type: 'mysql',
+  host: process.env.URL,
+  port: 30306,
+  username: process.env.USUARIO,
+  password: process.env.PASSWORD,
+  database: process.env.DBNAME,
+  autoLoadEntities: true,
+  synchronize: true,
+})
+```
 
-- `POST /log-actividad` - Crear un nuevo log de actividad
-- `GET /log-actividad` - Obtener todos los logs de actividad
-- `GET /log-actividad/:id` - Obtener un log de actividad por ID
-- `GET /log-actividad/usuario/:id_usuario` - Obtener logs por usuario
-- `GET /log-actividad/buscar/:accion` - Buscar logs por acción parcial
-- `PUT /log-actividad/:id` - Actualizar un log de actividad por ID
-- `DELETE /log-actividad/:id` - Eliminar un log de actividad por ID
+### Entidades Principales
+- Reserva
+- Habitacion
+- Huesped
+- Factura
+- Usuario
+- ContactoEmergencia
 
-### Usuarios
+## 🚀 Despliegue
 
-- `POST /usuario` - Crear un usuario
-- `GET /usuario` - Obtener todos los usuarios
-- `GET /usuario/:id` - Obtener un usuario por ID
-- `PUT /usuario/:id` - Actualizar un usuario por ID
-- `DELETE /usuario/:id` - Eliminar un usuario por ID
-- `GET /usuario/rol?rol=...` - Obtener usuarios por rol
-- `GET /usuario/buscar?nombre=...` - Buscar usuarios por nombre parcial
-- `GET /usuario/email?email=...` - Buscar usuario por email exacto
-- `GET /usuario/activos-recientes?fecha=...` - Obtener usuarios con último acceso después de una fecha dada
+### Docker
+```dockerfile
+FROM node:16-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+CMD ["npm", "run", "start:prod"]
+```
+
+### Kubernetes
+- Configuraciones en `/deploy`
+- Services y Deployments
+- ConfigMaps y Secrets
+
+## 📊 Monitoreo y Logging
+
+### Logging
+- Winston para logs estructurados
+- Niveles: ERROR, WARN, INFO, DEBUG
+- Rotación de logs
+
+### Métricas
+- Endpoints de health check
+- Prometheus metrics
+- Grafana dashboards
+
+## 🤝 Contribución
+
+### Estándares de Código
+- Seguir guía de estilo TypeScript
+- Documentar con JSDoc
+- Tests unitarios para nueva funcionalidad
+- Mantener la arquitectura modular
+
+### Proceso
+1. Fork del repositorio
+2. Crear rama feature
+3. Commit cambios
+4. Push a la rama
+5. Crear Pull Request
+
+## 📄 Licencia
+
+Este proyecto pertenece a Deyver Rios - ASIR
 
 ---
 
-## Licencia
-
-Este proyecto está bajo la licencia [MIT](LICENSE).
+**Hospeda+ Backend** - API Robusta para Gestión Hotelera Profesional

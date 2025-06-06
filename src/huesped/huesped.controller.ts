@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common';
 import { HuespedService } from './huesped.service';
 import { CreateHuespedDto } from './dto/create-huesped.dto';
 import { UpdateHuespedDto } from './dto/update-huesped.dto';
@@ -26,15 +26,19 @@ export class HuespedController {
   }
   */
 
-  // Obtener todos los huéspedes
-  // GET /huesped
+  // Obtener todos los huéspedes con filtros opcionales
+  // GET /huesped?nombre=&email=&telefono=
   @Get()
-  obtenerTodosLosHuespedes() {
-    return this.huespedService.obtenerTodosLosHuespedes();
+  obtenerTodosLosHuespedes(
+    @Query('nombre') nombre?: string,
+    @Query('email') email?: string,
+    @Query('telefono') telefono?: string,
+  ) {
+    return this.huespedService.obtenerTodosLosHuespedes(nombre, email, telefono);
   }
   /*
   Ejemplo:
-  GET http://localhost:4000/huesped
+  GET http://localhost:4000/huesped?nombre=Carlos&email=carlos@example.com&telefono=555-9876
   */
 
   // Obtener un huésped por ID

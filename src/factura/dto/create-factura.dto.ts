@@ -1,9 +1,14 @@
-import { IsNumber, IsEnum } from 'class-validator';
+import { IsNumber, IsEnum, IsOptional } from 'class-validator';
 
 export class CreateFacturaDto {
  // Monto total de la factura con hasta dos decimales
  @IsNumber({ maxDecimalPlaces: 2 })
  monto_total: number;
+
+ // Descuento aplicado a la factura con hasta dos decimales
+ @IsOptional()
+ @IsNumber({ maxDecimalPlaces: 2 })
+ descuento?: number;
 
  // Método de pago: efectivo, tarjeta o transferencia
  @IsEnum(['efectivo', 'tarjeta', 'transferencia'])

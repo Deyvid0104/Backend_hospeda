@@ -24,10 +24,16 @@ export class FacturaController {
   }
   */
 
-  // Obtener todas las facturas
-  // GET /factura
+  // Obtener todas las facturas o filtradas por estado y método de pago
+  // GET /factura?estado=pendiente&metodo_pago=efectivo
   @Get()
-  obtenerTodasLasFacturas() {
+  obtenerFacturasFiltradas(
+    @Query('estado') estado?: string,
+    @Query('metodo_pago') metodo_pago?: string,
+  ) {
+    if (estado || metodo_pago) {
+      return this.facturaService.obtenerFacturasFiltradas(estado, metodo_pago);
+    }
     return this.facturaService.obtenerTodasLasFacturas();
   }
   /*
