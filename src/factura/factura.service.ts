@@ -22,7 +22,7 @@ export class FacturaService {
   // Obtener factura por id_reserva
   async obtenerFacturaPorReserva(id_reserva: number): Promise<Factura | null> {
     return await this.FacturaRepository.findOne({
-      where: { reserva: { id_reserva } },
+      where: { reserva: { id_reserva: id_reserva } },
       relations: ['reserva', 'detalles_factura'],
     });
   }
