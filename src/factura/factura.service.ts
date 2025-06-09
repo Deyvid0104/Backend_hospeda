@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { CreateFacturaDto } from './dto/create-factura.dto';
 import { UpdateFacturaDto } from './dto/update-factura.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Factura } from './entities/factura.entity';
 import { Repository, Between } from 'typeorm';
 import { DetalleFactura } from '../detalle_factura/entities/detalle_factura.entity';
+import { DetalleReserva } from '../detalle_reserva/entities/detalle_reserva.entity';
 
 @Injectable()
 export class FacturaService {
@@ -14,20 +15,41 @@ export class FacturaService {
     private FacturaRepository: Repository<Factura>,
     @InjectRepository(DetalleFactura, 'austral')
     private DetalleFacturaRepository: Repository<DetalleFactura>,
+    @InjectRepository(DetalleReserva, 'austral')
+    private DetalleReservaRepository: Repository<DetalleReserva>,
   ) {}
+
+  // Obtener factura por id_reserva
+  async obtenerFacturaPorReserva(id_reserva: number): Promise<Factura | null> {
+    return await this.FacturaRepository.findOne({
+      where: { reserva: { id_reserva } },
+      relations: ['reserva', 'detalles_factura'],
+    });
+  }
 
   // Crear una nueva factura en la base de datos
   async crearFactura(createFacturaDto: CreateFacturaDto): Promise<Factura> {
-    // Calcular monto_total basado en detalles de factura antes de guardar
+    // Verificar si ya existe una factura para la reserva
+    const facturaExistente = await this.FacturaRepository.findOne({
+      where: { reserva: { id_reserva: createFacturaDto.id_reserva } },
+    });
+    if (facturaExistente) {
+      throw new ConflictException({
+        message: `Ya existe una factura para la reserva con id ${createFacturaDto.id_reserva}`,
+        id_factura: facturaExistente.id_factura,
+      });
+    }
+
+    // Calcular monto_total basado en detalles de reserva antes de guardar
     let montoTotal = createFacturaDto.monto_total || 0;
     if (createFacturaDto.id_reserva) {
-      // Obtener detalles de factura asociados a la reserva
-      const detalles = await this.DetalleFacturaRepository.find({
-        where: { factura: { id_factura: createFacturaDto.id_reserva } },
+      // Obtener detalles de reserva asociados a la reserva
+      const detallesReserva = await this.DetalleReservaRepository.find({
+        where: { reserva: { id_reserva: createFacturaDto.id_reserva } },
       });
-      if (detalles.length > 0) {
-        montoTotal = detalles.reduce((total, detalle) => {
-          return total + detalle.cantidad * Number(detalle.precio_unitario);
+      if (detallesReserva.length > 0) {
+        montoTotal = detallesReserva.reduce((total, detalle) => {
+          return total + detalle.noches * Number(detalle.precio_aplicado);
         }, 0);
         // Aplicar descuento si existe
         if (createFacturaDto.descuento) {

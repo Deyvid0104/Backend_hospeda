@@ -8,6 +8,13 @@ import { UpdateFacturaDto } from './dto/update-factura.dto';
 export class FacturaController {
   constructor(private readonly facturaService: FacturaService) {}
 
+  // Obtener factura por id_reserva
+  // GET /factura/por-reserva/:id_reserva
+  @Get('por-reserva/:id_reserva')
+  obtenerFacturaPorReserva(@Param('id_reserva') id_reserva: string) {
+    return this.facturaService.obtenerFacturaPorReserva(+id_reserva);
+  }
+
   // Crear una nueva factura
   // POST /factura
   @Post()
