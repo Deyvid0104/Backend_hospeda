@@ -21,6 +21,13 @@ export class HabitacionController {
     return this.habitacionService.crearHabitacion(createHabitacionDto);
   }
 
+  // Nuevo endpoint para obtener fechas de ocupación por habitación
+  // GET /habitacion/ocupacion
+  @Get('ocupacion')
+  obtenerFechasOcupacion() {
+    return this.habitacionService.obtenerFechasOcupacionPorHabitacion();
+  }
+
   // Obtener habitaciones disponibles en un rango de fechas
   // GET /habitacion/disponibilidad?fechaInicio=YYYY-MM-DD&fechaFin=YYYY-MM-DD
   @Get('disponibilidad')

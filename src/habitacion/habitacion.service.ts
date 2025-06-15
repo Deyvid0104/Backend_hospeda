@@ -47,6 +47,21 @@ export class HabitacionService {
     return await this.HabitacionRepository.find();
   }
 
+  // Nuevo método para obtener fechas de ocupación por habitación
+  async obtenerFechasOcupacionPorHabitacion(): Promise<any[]> {
+    // Consulta para obtener id de habitación y sus rangos de fechas ocupadas basadas en reservas activas
+    const query = this.HabitacionRepository
+      .createQueryBuilder('habitacion')
+      .leftJoin('habitacion.detalles_reserva', 'detalle')
+      .leftJoin('detalle.reserva', 'reserva')
+      .select('habitacion.id_habitacion', 'id_habitacion')
+      .addSelect('GROUP_CONCAT(CONCAT(reserva.fecha_entrada, " a ", reserva.fecha_salida) SEPARATOR ", ")', 'fechas_ocupacion')
+      .groupBy('habitacion.id_habitacion');
+
+    const result = await query.getRawMany();
+    return result;
+  }
+
   // Obtener una habitación por su identificador único
   async obtenerHabitacionPorId(id: number): Promise<Habitacion> {
     const habitacion = await this.HabitacionRepository.findOneBy({ id_habitacion: id });
